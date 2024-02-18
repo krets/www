@@ -1,0 +1,124 @@
+
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="krets.com is fun">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" sizes="any">
+
+
+  <meta name="theme-color" content="#000000">
+  <title>krets.com</title>
+  <style>
+    body {
+        background-color: black;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script type="text/javascript">
+
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+    let lines = [];
+    let step = 5;
+    let tick = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    let amplitude = 20
+    let frequency = 90
+    let lineCount = 60;
+    let pointCount = 60;
+    let wobble = 130;
+    let windowPad = .2;
+    let lineGrow = .08;
+    let tickWobble = 2;
+
+    function makeLines() {
+        lines.length = 0;
+        let step_x = (window.innerWidth*(1-windowPad))/pointCount;
+        let start_x = window.innerWidth*windowPad/2;
+        let step_y = (window.innerHeight*(1-windowPad))/lineCount;
+        let start_y = window.innerHeight*windowPad/2;
+        
+        for (let i = 0; i < lineCount; i++) {
+            let line = [];
+            let base_y = start_y + i * step_y;
+            for (let j = 0; j < pointCount; j++) {
+                line.push([j*step_x+start_x, base_y + (Math.random() * wobble) - wobble/2 ]);
+            }
+            lines.push(line);
+        }
+        drawStuff();
+    }
+
+    function drawStuff() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        let start_y = window.innerHeight*windowPad/2;
+        let step_y = (window.innerHeight*(1-windowPad))/lineCount;
+
+        for (let i = 0; i < lines.length; i++){
+            let base_y = start_y + i * step_y;
+            let line = lines[i];
+
+
+            for (let j=0; j < line.length; j++){
+                let point = line[j];
+                // let scale = 1 - Math.abs(window.innerWidth/2 - point[0])/(window.innerWidth*(1-windowPad)/2);
+                let scale = Math.pow(1 - Math.sqrt(Math.abs(mouseX - point[0])/(window.innerWidth*(1-windowPad)/2)), 4);
+                
+                // let scale = Math.abs(point[0]-(window.innerWidth/2));
+                // scale *= scale;
+                // let scale = 1 - Math.sqrt(Math.abs(window.innerWidth/2 - point[0])/(window.innerWidth*(1-windowPad)/2));
+                // scale = Math.log(Math.abs(window.innerWidth/2 - point[0])/(window.innerWidth*(1-windowPad)/2)) * scale;
+                let max = base_y;
+                // let max = base_y+wobble*scale;
+                let min = base_y-wobble*scale;
+                point[1] -= tickWobble - (tickWobble*Math.random()*2);
+
+                point[1] = Math.min(Math.max(point[1],min),max);
+                line[j] = point;
+            }
+            context.beginPath();
+            context.lineWidth = Math.max((i+1)*lineGrow,1);
+            context.moveTo(line[0][0], line[0][1]);
+            for (let j=1; j < line.length; j++){
+                let point = line[j];
+                context.lineTo(point[0], point[1]);
+            }
+            // context.closePath();
+            context.fillStyle = "#000000";
+            context.fill()
+            context.strokeStyle = '#ffffff';
+            context.stroke();
+        }
+    }
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        makeLines();
+ 
+    }
+
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    window.addEventListener('resize', resizeCanvas, false);
+    setInterval(drawStuff, 20);
+    resizeCanvas();
+
+
+</script>
+</body>
