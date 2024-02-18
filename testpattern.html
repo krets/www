@@ -204,51 +204,46 @@
             }
         });
 
+        function changeMenuPosition(position) {
+            var menuContainer = document.querySelector('.menu-container');
+            menuContainer.style.top = 'auto';
+            menuContainer.style.bottom = 'auto';
+            menuContainer.style.left = 'auto';
+            menuContainer.style.right = 'auto';
+
+            menuContainer.classList.remove('top', 'bottom', 'left', 'right');
+
+            menuContainer.classList.add(position[0], position[1]);
+
+            menuContainer.style[position[0]] = 0;
+            menuContainer.style[position[1]] = 0;
+        }
+        function toggleDisplay(element) {
+            if(element.style.display === ""){
+                element.style.display = "none";
+            }else{
+                element.style.display = "";
+            }
+        }
         document.addEventListener('keydown', function(event) {
             var key = event.key.toLowerCase();
-            console.log('key', key)
             if(key === 'm') {
                 currentPosition = (currentPosition + 1) % positions.length;
                 var position = positions[currentPosition].toLowerCase().split(' ');
-
-                // Reset all sides to 'auto'
-                var menuContainer = document.querySelector('.menu-container');
-                menuContainer.style.top = 'auto';
-                menuContainer.style.bottom = 'auto';
-                menuContainer.style.left = 'auto';
-                menuContainer.style.right = 'auto';
-
-                // Remove old position classes
-                menuContainer.classList.remove('top', 'bottom', 'left', 'right');
-
-                // Add new position classes
-                menuContainer.classList.add(position[0], position[1]);
-
-                // Set the new position
-                menuContainer.style[position[0]] = 0;
-                menuContainer.style[position[1]] = 0;
-            }else if(key === 'n') {
+                changeMenuPosition(position);
+            } else if(key === 'n') {
                 nextPattern();
-            }else if(key === 'b') {
+            } else if(key === 'b') {
                 nextPattern(-1);
-            }else if(key === '`'){
+            } else if(key === '`'){
                 var menuContainer = document.querySelector('.menu-container');
-                if(menuContainer.style.display === ""){
-                    menuContainer.style.display = "none";
-                }else{
-                    menuContainer.style.display = "";
-                }
+                toggleDisplay(menuContainer);
             }
         });
 
-
         document.querySelector('.hamburger').addEventListener('click', function(event) {
             var menu = document.querySelector('.menu');
-            if (menu.style.display === 'block'){
-                menu.style.display = 'none';
-            }else {
-                menu.style.display = 'block';
-            }
+            toggleDisplay(menu);
             event.stopPropagation();
         });
 
@@ -293,23 +288,7 @@
                 li.addEventListener('click', function() {
                     currentPosition = positions.indexOf(this.innerText);
                     var position = positions[currentPosition].toLowerCase().split(' ');
-
-                    // Reset all sides to 'auto'
-                    var menuContainer = document.querySelector('.menu-container');
-                    menuContainer.style.top = 'auto';
-                    menuContainer.style.bottom = 'auto';
-                    menuContainer.style.left = 'auto';
-                    menuContainer.style.right = 'auto';
-
-                    // Remove old position classes
-                    menuContainer.classList.remove('top', 'bottom', 'left', 'right');
-
-                    // Add new position classes
-                    menuContainer.classList.add(position[0], position[1]);
-
-                    // Set the new position
-                    menuContainer.style[position[0]] = 0;
-                    menuContainer.style[position[1]] = 0;
+                    changeMenuPosition(position);
                 });
             });
             document.querySelectorAll('#pattern .sub-menu li').forEach(function(li) {
