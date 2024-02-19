@@ -34,10 +34,8 @@
 
         .hamburger {
             cursor: pointer;
-            font-weight: bold;
-            font-size: 16pt;
-            letter-spacing: -0.1em;
-            padding: 6px 8px;
+            font-size: 40pt;
+            padding: 0 0.3em;
             background-color: #ccc;
         }
         ul li {
@@ -147,7 +145,7 @@
 </head>
 <body>
     <div class="menu-container">
-        <div class="hamburger">≡≡</div>
+        <div class="hamburger">&#8801;</div>
     <ul class="menu">
         <li id="menuPosition">Menu Position
             <ul class="sub-menu">
@@ -222,7 +220,7 @@
             if(element.style.display === ""){
                 element.style.display = "none";
             }else{
-                element.style.display = "";
+                element.style.display = "block";
             }
         }
         document.addEventListener('keydown', function(event) {
