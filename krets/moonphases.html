@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background: #193257;
+            font-family: sans-serif;
+            color: #ccc;
+        }
+        #wrap {
+            text-align: center;
+        }
+        #phase {
+            display:block;
+        }
+        .shadow {
+            background-color: #051631;
+        }
+        .light {
+            background-color: #a7b2bd;
+        }
+        #today{
+            margin: 1em auto;
+        }
+        #today > .moon {
+            margin: 1em auto;
+        }
+        #today span {
+            display:block;
+            text-align: center;
+        }
+        .month {
+            float:left;
+        }
+        .month .moon {
+            margin: 7px;
+        }
+        #calendar {
+            display: inline-block;
+        }
+        #calendar h1 {
+            text-align: center;
+        }
+        .month h2 {
+            text-align:center;
+        }
+        .clear {
+            clear:both;
+        }
+        .month .moon{
+            border-color: #193257;
+            border-style: solid;
+            border-width: 4px;
+        }
+        .moon-day.highlight .moon{
+            border-color: #fc0;
+        }
+        .moon-day {
+            position: relative;
+        }
+        .moon-day.past {
+            opacity: .5;
+        }
+        .moon-date {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align:center;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            opacity: 0;
+        }
+        .moon-day.today .moon-date,
+        .moon-day:hover .moon-date {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+<div id="wrap">
+<div id="today"></div>
+<div id="calendar"></div>
+</div>
+<script>
+let left, right, cover;
+// const LUNAR_CYCLE = 29.5305888531;
+const LUNAR_CYCLE = 29.53058770576;
+const today = new Date();
+// reference date should be a known new moon
+const reference_date = Date.UTC(2021, 11, 31, 18, 33)
+
+
+const getJulianDate = (date = new Date()) => {
+  const time = date.getTime();
+  const tzoffset = date.getTimezoneOffset()
+
+  return (time / 86400000) - (tzoffset / 1440) + 2440587.5;
+}
+
+const getLunarAge = (date = new Date()) => {
+  const percent = getLunarAgePercent(date);
+  const age = percent * LUNAR_CYCLE;
+  return age;
+}
+const getLunarAgePercent = (date = new Date()) => {
+  return normalize((getJulianDate(date) - 2451550.1) / LUNAR_CYCLE);
+}
+const normalize = value => {
+  value = value - Math.floor(value);
+  if (value < 0)
+    value = value + 1
+  return value;
+}
+function getPhaseOld(date) {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const utcDate = Date.UTC(year, month - 1, day) / 86400000 -
+                  reference_date / 86400000;
+  const lunationNumber = Math.floor(utcDate / LUNAR_CYCLE);
+  // Calculate the moon's age in days
+  const phase = (utcDate - lunationNumber * LUNAR_CYCLE) / LUNAR_CYCLE;
+  return [moonAge, phase];
+}
+function getPhase(date) {
+    const phase = getLunarAgePercent(date)
+    const moonAge = phase * LUNAR_CYCLE;
+    return [moonAge, phase];
+}
+function moon_shape(phase, size) {
+  if (phase < 0.5) {
+    left = 'shadow';
+    right = 'light';
+  } else {
+    left = 'light';
+    right = 'shadow';
+  }
+
+  if (Math.abs(0.5 - phase) > 0.25) {
+    cover = 'shadow';
+  } else {
+    cover = 'light';
+  }
+
+  let ellipse_scale = Math.abs(1.0-phase*4.0) % 1.0;
+  if (phase > .5 && phase < .75){
+      ellipse_scale = Math.abs(1 - ellipse_scale);
+  }
+
+  let moonDiv = document.createElement('div');
+  moonDiv.className = "moon"
+  moonDiv.style.width = `${size}px`;
+  moonDiv.style.height = `${size}px`;
+  moonDiv.style.borderRadius = '50%';
+  moonDiv.style.overflow = 'hidden';
+  moonDiv.setAttribute('phase', phase)
+
+  let leftDiv = document.createElement('div');
+  leftDiv.className = "left "+left;
+  leftDiv.style.width = '50%';
+  leftDiv.style.height = '100%';
+  leftDiv.style.float = 'left';
+
+  let rightDiv = document.createElement('div');
+  rightDiv.className = "right "+right;
+  rightDiv.style.width = '50%';
+  rightDiv.style.height = '100%';
+  rightDiv.style.float = 'left';
+
+  let coverDiv = document.createElement('div');
+  coverDiv.className = "cover "+cover;
+  coverDiv.style.width = `${size * ellipse_scale}px`;
+  coverDiv.style.height = `${size}px`;
+  coverDiv.style.borderRadius = '50%';
+  coverDiv.style.position = 'relative';
+  coverDiv.style.left = `${size / 2 - size * ellipse_scale / 2}px`;
+
+  moonDiv.appendChild(leftDiv);
+  moonDiv.appendChild(rightDiv);
+  moonDiv.appendChild(coverDiv);
+  moonDiv.title = phase_name(phase);
+  return moonDiv;
+}
+
+function perfect_phase(moonAge, multiplier) {
+    return Math.abs(LUNAR_CYCLE * multiplier - moonAge) < .5
+}
+
+function phase_name(moonAge){
+    if (perfect_phase(moonAge, .25)){
+        return "First Quarter";
+    }else if (perfect_phase(moonAge, 0) || perfect_phase(moonAge, 1)){
+        return "New Moon"
+    }else if (perfect_phase(moonAge, .5)){
+        return "Full Moon"
+    }else if (perfect_phase(moonAge, .75)) {
+        return "Last Quarter"
+    }else{
+        let name = "";
+        let phase = moonAge/LUNAR_CYCLE;
+        if (phase >= .5){
+            name = "Waning ";
+        }else{
+            name = "Waxing ";
+        }
+        if (Math.abs(.5-phase) > .25){
+            name = name + "Crescent";
+        }else{
+            name = name + "Gibbous";
+        }
+        return name;
+    }
+}
+
+function generateMoonCalendar(year) {
+  const calendarElement = document.getElementById('calendar');
+
+  const yearHeader = document.createElement('h1');
+  yearHeader.innerText = year;
+  calendarElement.appendChild(yearHeader);
+
+  let past = "past"
+
+  for (let month = 1; month <= 12; month++) {
+    const monthWrap = document.createElement('div');
+    monthWrap.className="month";
+    const monthHeader = document.createElement('h2');
+    const monthText = new Date(year, month - 1, 1).toLocaleString('default', { month: 'short' })
+    monthHeader.innerText = monthText;
+    calendarElement.appendChild(monthWrap);
+    monthWrap.appendChild(monthHeader);
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    let moonAge = 0;
+    let phase = 0;
+    let date = null;
+    for (let day = 1; day <= daysInMonth; day++) {
+      date = new Date(year, month - 1, day, 12, 0 , 0);
+      // date.setUTCHours(12, 0, 0, 0);
+      const dayDiv = document.createElement('div');
+      dayDiv.classList.add('moon-day');
+      [moonAge, phase] = getPhase(date);
+
+      if (perfect_phase(moonAge, 0) || perfect_phase(moonAge, .5) || perfect_phase(moonAge, 1)){
+          dayDiv.classList.add('highlight');
+      }
+
+      if(date.getDate() === today.getDate() && date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth()){
+          dayDiv.classList.add('today');
+          past = "upcoming"
+      }
+      dayDiv.classList.add(past);
+      dayDiv.appendChild(moon_shape(phase, 48));
+      const dateString = `${monthText} ${date.getDate()}`;
+
+      const moon_date = document.createElement("div");
+      moon_date.innerHTML = dateString;
+      moon_date.classList.add("moon-date");
+      dayDiv.appendChild(moon_date);
+
+      monthWrap.appendChild(dayDiv);
+    }
+  }
+  const br = document.createElement('br');
+  br.className = "clear";
+  calendarElement.appendChild(br)
+}
+
+
+// const [moonAge, phase] = getPhase(today);
+const moonAge = getLunarAge(today);
+const phase = getLunarAgePercent(today);
+document.getElementById('today').appendChild(moon_shape(phase, 200))
+let name = document.createElement('span');
+document.getElementById('today').appendChild(name);
+name.innerText = phase_name(moonAge);
+generateMoonCalendar(new Date().getFullYear());
+
+</script>
+</body>
