@@ -36,7 +36,8 @@
             cursor: pointer;
             font-size: 40pt;
             padding: 0 0.3em;
-            background-color: #ccc;
+            background-color: rgba(200, 200, 200, 0.11);
+            color: rgba(30, 30, 30, 0.6);
         }
         ul li {
             cursor: pointer;
@@ -48,8 +49,8 @@
             display: none;
             background-color: #545454;
             z-index: 1;
-            top: 100%;
-            left: 20px; /* Change this line */
+            top: 10%;
+            left: 98%;
         }
         ul.menu > li:hover,
         ul.sub-menu li:hover {
@@ -76,14 +77,14 @@
         .menu-container.right .menu,
         .menu-container.right .sub-menu {
             left: auto;
-            right: 0;
+            right: 98%;
         }
 
         /* Menu expands upwards */
         .menu-container.bottom .menu,
         .menu-container.bottom .sub-menu {
             top: auto;
-            bottom: 100%;
+            bottom: 10%;
         }
         .red {
             background-color: #f00;
@@ -130,7 +131,7 @@
         }
         .test2 {
             background-color: #000;
-            background-size: 40px 40px;
+            background-size: 39px 39px;
             background-image:
               linear-gradient(to right, grey 1px, transparent 1px),
               linear-gradient(to bottom, grey 1px, transparent 1px);
