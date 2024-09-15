@@ -1,0 +1,87 @@
+body {
+    background: #193257;
+    font-family: sans-serif;
+    color: #ccc;
+}
+#wrap {
+    text-align: center;
+}
+#phase {
+    display:block;
+}
+.shadow {
+    background-color: #051631;
+}
+.light {
+    background-color: #a7b2bd;
+}
+#today{
+    margin: 1em auto;
+}
+#today > .moon {
+    margin: 1em auto;
+}
+#today span {
+    display:block;
+    text-align: center;
+}
+.month {
+    float:left;
+}
+.month .moon {
+    margin: 7px;
+}
+#calendar {
+    display: inline-block;
+}
+#calendar h1 {
+    text-align: center;
+}
+.month h2 {
+    text-align:center;
+}
+.clear {
+    clear:both;
+}
+.month .moon{
+    border-color: #193257;
+    border-style: solid;
+    border-width: 4px;
+}
+.moon-day.highlight .moon{
+    border-color: #fc0;
+}
+.moon-day {
+    position: relative;
+}
+.moon-day.past {
+    opacity: .5;
+}
+.moon-date {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align:center;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    opacity: 0;
+}
+.moon-day.today .moon-date,
+.moon-day:hover .moon-date {
+    opacity: 1;
+}
+span.phase {
+    margin-bottom: 1em;
+}
+table {
+    margin: auto;
+}
+table td {
+    padding-left: 1em;
+}
+table td:nth-child(1) {
+    text-align: right;
+}
+
+table td:nth-child(2) {
+    text-align: left;
+}
