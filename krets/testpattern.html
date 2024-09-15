@@ -202,7 +202,12 @@
                 }
             }
         });
-
+        // Hide the main menu when the mouse leaves the submenu
+        document.querySelectorAll('.menu, .sub-menu').forEach(function(menu) {
+            menu.addEventListener('mouseleave', function() {
+                document.querySelector('.menu').style.display = 'none';
+            });
+        });
         function changeMenuPosition(position) {
             var menuContainer = document.querySelector('.menu-container');
             menuContainer.style.top = 'auto';
