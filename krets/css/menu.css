@@ -1,0 +1,54 @@
+nav {
+    opacity: 0;
+    visibility: hidden;
+    position: fixed; /* Keep it at the top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(51, 51, 51, 0.8); /* Slightly transparent background */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Modern sans-serif font */
+    z-index: 1000; /* Ensure it's on top */
+    transition: opacity 120ms ease-in-out, visibility 120ms ease-in-out; /* Smooth fade-in transition */
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+nav ul li {
+    float: left;
+}
+
+nav ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    background-color: rgba(17, 17, 17, 0.8); /* Slightly darker on hover */
+}
+
+/* Create the hover area at the top of the page */
+#menu-trigger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    height: 50px; /* Same height as the nav's appearance trigger */
+    background-color: transparent;
+    z-index: 999; /* Ensure it's under the nav but above other content */
+}
+
+/* Show the nav when hovering over the trigger */
+#menu-trigger:hover + nav,
+nav:hover {
+    opacity: 1; /* Fade in */
+    visibility: visible; /* Make it interactable */
+    transition-delay: 150ms; /* Add a slight delay */
+}
