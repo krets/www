@@ -50,7 +50,7 @@
             position: absolute;
             display: none;
             background-color: #545454;
-            z-index: 1;
+            z-index: 1001;
             top: 10%;
             left: 98%;
         }
@@ -147,17 +147,11 @@
     </style>
 </head>
 <body>
-    <div class="menu-container">
+    <div class="menu-container bottom">
         <div class="hamburger">&#8801;</div>
     <ul class="menu">
-        <li id="menuPosition">Menu Position
-            <ul class="sub-menu">
-                <li>Top Left</li>
-                <li>Top Right</li>
-                <li>Bottom Left</li>
-                <li>Bottom Right</li>
-            </ul>
-        </li>
+        <li onclick="nextPattern()">Next Pattern (N)</li>
+        <li onclick="nextPattern(-1)">Previous Pattern (B)</li>
         <li id="pattern">Pattern
             <ul class="sub-menu">
                 <!-- filled in dynamically -->
@@ -166,8 +160,9 @@
         <li><a href="#" id="fullscreen">Toggle Fullscreen</a></li>
     </ul>
     </div>
-
+    <script src="/js/menu.js"></script>
     <script>
+
         var patterns = {
             "Red": "red",
             "Green": "green",
@@ -259,17 +254,10 @@
         }
         document.addEventListener('keydown', function(event) {
             var key = event.key.toLowerCase();
-            if(key === 'm') {
-                currentPosition = (currentPosition + 1) % positions.length;
-                var position = positions[currentPosition].toLowerCase().split(' ');
-                changeMenuPosition(position);
-            } else if(key === 'n') {
+            if(key === 'n') {
                 nextPattern();
             } else if(key === 'b') {
                 nextPattern(-1);
-            } else if(key === '`'){
-                var menuContainer = document.querySelector('.menu-container');
-                toggleDisplay(menuContainer);
             }
         });
 
@@ -279,11 +267,6 @@
             event.stopPropagation();
         });
 
-        document.addEventListener('click', function(event) {
-            document.querySelector('.menu').style.display = 'none';
-            nextPattern();
-            event.stopPropagation();
-        });
         function nextPattern(inc){
             console.log("inc", inc, 'cur', currentPattern);
             patternKeys.forEach(pattern => {
@@ -335,8 +318,8 @@
                     });
                 });
             });
+            changeMenuPosition(["bottom", "left"]);
         });
     </script>
 </body>
-<script src="/js/menu.js"></script>
 </html>
