@@ -22,7 +22,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 20px;
 }
 
 #wrap {
@@ -33,6 +32,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+    background: #1e1e1e;
+        border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
 
 #preview {
@@ -40,9 +42,9 @@ body {
   grid-template-columns: repeat(4, 30px);
   grid-template-rows: repeat(2, 30px);
   gap: 2px;
-  padding: 0px;
-  border: 2px solid #111;
+  padding: 2em;
   width: 126px;
+
 }
 
 #score, #leader_board {

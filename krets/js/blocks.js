@@ -6,7 +6,9 @@ let score = 0;
 let paused = false;
 let tick_speed = 100;
 const overlay = document.getElementById('overlay');
-const cellsByCoord = {};
+const boardCellsByCoord = {};
+const previewCellsByCoord = {};
+
 
 let nextShape = null;
 let currentShape = null;
@@ -28,11 +30,22 @@ const shapes = {
 let selections = {}
 
 // Function to get a cell by its coordinates
-function getCellByCoord(x, y) {
-    if (cellsByCoord[x] && cellsByCoord[x][y]) {
-        return cellsByCoord[x][y];
+function getCellByCoord(cellsObject, x, y) {
+    if (cellsObject[x] && cellsObject[x][y]) {
+        return cellsObject[x][y];
     }
     return null;
+}
+function getBoardCellByCoord(x, y){
+    return getCellByCoord(boardCellsByCoord, x, y)
+}
+
+function forEachCell(cellsObject, callback) {
+    for (let x in cellsObject) {
+        for (let y in cellsObject[x]) {
+            callback(cellsObject[x][y], parseInt(x), parseInt(y));
+        }
+    }
 }
 
 // Function to create a deep copy of a shape
@@ -111,9 +124,23 @@ function rotateShapeInstance(shapeInstance) {
 
 function drawShape() {
     currentShape.coords.forEach(([dx, dy]) => {
-        const cell = getCellByCoord(currentX + dx, currentY + dy);
+        const cell = getBoardCellByCoord( currentX + dx, currentY + dy);
         if (cell) {
             cell.classList.add('shape-' + currentShape.type);
+        }
+    });
+}
+
+function drawPreview() {
+    resetCells(previewCellsByCoord);
+
+    const centerX = 1;
+    const centerY = 0;
+
+    nextShape.coords.forEach(([dx, dy]) => {
+        const cell = getCellByCoord(previewCellsByCoord, centerX + dx, centerY + dy);
+        if (cell) {
+            cell.classList.add('shape-' + nextShape.type);
         }
     });
 }
@@ -121,7 +148,7 @@ function drawShape() {
 // Function to clear a shape from the board
 function clearShape() {
     currentShape.coords.forEach(([dx, dy]) => {
-        const cell = getCellByCoord(currentX + dx, currentY + dy);
+        const cell = getBoardCellByCoord(currentX + dx, currentY + dy);
         if (cell) {
             cell.classList.remove('shape-' + currentShape.type);
         }
@@ -130,38 +157,43 @@ function clearShape() {
 
 document.addEventListener("DOMContentLoaded", function() {
     const board = document.getElementById("board");
+    const preview = document.getElementById("preview");
 
-    for(let y = 0; y < board_rows; y++) {
-        for(let x = 0; x < board_cols; x++) {
-            // Create a new cell
-            const cell = document.createElement("div");
-            cell.className = "cell";
+    createBoard(board, board_rows, board_cols, boardCellsByCoord);
+    createBoard(preview, 2, 4, previewCellsByCoord);
 
-            // Set a data attribute for coordinates (optional, but can be useful)
-            cell.dataset.x = x;
-            cell.dataset.y = y;
-
-            // Add the cell to the board
-            board.appendChild(cell);
-
-            // Store a reference to the cell in our object
-            if (!cellsByCoord[x]) {
-                cellsByCoord[x] = {};
-            }
-            cellsByCoord[x][y] = cell;
-        }
-    }
     initializeGame();
     start();
 });
 
+function createBoard(container, rows, cols, cellsObject) {
+    for(let y = 0; y < rows; y++) {
+        for(let x = 0; x < cols; x++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+            container.appendChild(cell);
 
+            if (!cellsObject[x]) {
+                cellsObject[x] = {};
+            }
+            cellsObject[x][y] = cell;
+        }
+    }
+}
+
+function resetCells(cellsObject) {
+    forEachCell(cellsObject, (cell) => {
+        cell.className = 'cell';
+    });
+}
 
 function initializeGame() {
     // Clear the board
     for(let y = 0; y < board_rows; y++) {
         for(let x = 0; x < board_cols; x++) {
-            const cell = getCellByCoord(x, y);
+            const cell = getBoardCellByCoord(x, y);
             if (cell) {
                 cell.className = 'cell';
             }
@@ -274,7 +306,7 @@ function canMoveTo(newX, newY) {
 }
 
 function isOccupied(x, y) {
-    const cell = getCellByCoord(x, y);
+    const cell = getBoardCellByCoord(x, y);
     return cell && cell.classList.contains('locked');
 }
 
@@ -282,7 +314,7 @@ function lockShape() {
     currentShape.coords.forEach(([dx, dy]) => {
         const x = currentX + dx;
         const y = currentY + dy;
-        const cell = getCellByCoord(x, y);
+        const cell = getBoardCellByCoord(x, y);
         if (cell) {
             cell.classList.add('locked');
         }
@@ -296,6 +328,7 @@ function spawnNewShape() {
     }
     currentShape = nextShape;
     nextShape = createShape(getRandomShape());
+    drawPreview();
     currentX = Math.floor(board_cols / 2) - 1;
     currentY = 0;
     if (!canMoveTo(currentX, currentY) && !isFirstShape) {
@@ -405,7 +438,7 @@ function clearFullRows() {
     for (let y = 0; y < board_rows; y++) {
         let isFull = true;
         for (let x = 0; x < board_cols; x++) {
-            const cell = getCellByCoord(x, y);
+            const cell = getBoardCellByCoord(x, y);
             if (!cell || !cell.classList.contains('locked')) {
                 isFull = false;
                 break;
@@ -414,7 +447,7 @@ function clearFullRows() {
         if (isFull) {
             // Clear the full row
             for (let x = 0; x < board_cols; x++) {
-                const cell = getCellByCoord(x, y);
+                const cell = getBoardCellByCoord(x, y);
                 if (cell) {
                     cell.className = 'cell'; // Reset the cell
                 }
@@ -422,8 +455,8 @@ function clearFullRows() {
             // Move all rows above down by one
             for (let row = y; row > 0; row--) {
                 for (let x = 0; x < board_cols; x++) {
-                    const cellAbove = getCellByCoord(x, row - 1);
-                    const cellCurrent = getCellByCoord(x, row);
+                    const cellAbove = getBoardCellByCoord(x, row - 1);
+                    const cellCurrent = getBoardCellByCoord(x, row);
                     if (cellAbove && cellCurrent) {
                         cellCurrent.className = cellAbove.className;
                     }
@@ -431,7 +464,7 @@ function clearFullRows() {
             }
             // Clear the top row
             for (let x = 0; x < board_cols; x++) {
-                const cell = getCellByCoord(x, 0);
+                const cell = getBoardCellByCoord(x, 0);
                 if (cell) {
                     cell.className = 'cell';
                 }
