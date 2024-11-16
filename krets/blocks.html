@@ -2,6 +2,9 @@
 <html>
 <head>
     <link rel="stylesheet" href="css/blocks.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&family=Gugi&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="game-container">
@@ -10,9 +13,23 @@
     <div id="overlay" style="display: none;"></div>
   </div>
   <div id="info">
-    <div id="score"></div>
+    <div id="score-details">
+      <div id="score" class="info-item">
+        <span class="info-title">Score:</span>
+        <span class="info-value" id="score-value"></span>
+      </div>
+      <div id="lines" class="info-item">
+        <span class="info-title">Lines:</span>
+        <span class="info-value" id="lines-value"></span>
+      </div>
+      <div id="level" class="info-item">
+        <span class="info-title">Level:</span>
+        <span class="info-value" id="level-value"></span>
+      </div>
+    </div>
     <div id="preview"></div>
     <div id="leader_board"></div>
+
   </div>
 </div>
 

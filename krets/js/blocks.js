@@ -171,6 +171,12 @@ document.addEventListener("DOMContentLoaded", function() {
     start();
 });
 
+function updateInfo() {
+    document.getElementById("score-value").textContent = score;
+    document.getElementById("lines-value").textContent = lines;
+    document.getElementById("level-value").textContent = level;
+}
+
 function createBoard(container, rows, cols, cellsObject) {
     for(let y = 0; y < rows; y++) {
         for(let x = 0; x < cols; x++) {
@@ -204,7 +210,11 @@ function initializeGame() {
             }
         }
     }
+    lines = 0;
+    points = 0;
+    level = 1;
     isFirstShape = true;
+    updateInfo()
     spawnNewShape();
 }
 
@@ -425,13 +435,22 @@ document.addEventListener('keydown', (event) => {
 });
 
 // Optional: Add a game loop for continuous downward movement
-function gameLoop() {
-    if(paused === false) {
-        moveDown();
+function getTimeout() {
+    // Ensure the level does not exceed 10
+    if (level >= 10) {
+        return 0;
     }
-    setTimeout(gameLoop, 1000);
+    // Calculate timeout decreasing linearly from 1000 to 0
+    return 1000 - ((level - 1) * (1000 / 9)); // 9 intervals from level 1 to 10
 }
 
+function gameLoop() {
+    if (paused === false) {
+        moveDown();
+    }
+    // Assume `currentLevel` is defined and updates as needed
+    setTimeout(gameLoop, getTimeout());
+}
 
 
 function start() {
@@ -480,12 +499,14 @@ function clearFullRows() {
             // Check the same row again as it now contains the row above
             y--;
         }
-        if (linesCleared > 0) {
-            lines += linesCleared;
-            let newPoints = linePoints[linesCleared - 1] * level;
-            animatePoints(newPoints);
-            score += newPoints
-        }
+    }
+    if (linesCleared > 0) {
+        lines += linesCleared;
+        let newPoints = linePoints[linesCleared - 1] * level;
+        animatePoints(newPoints);
+        score += newPoints;
+        level = Math.floor(lines / 10) + 1;
+        updateInfo();
     }
 }
 function animatePoints(value) {

@@ -2,7 +2,7 @@ body {
     margin:0;
     padding: .5em;
     background-color: #222;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Geo", sans-serif;
 }
 #wrap {
     padding: 2em;
@@ -121,4 +121,31 @@ body {
     left: var(--random-left);
     opacity: 0;
   }
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    margin: 5px;
+    padding: 10px;
+    color: white;
+    border-radius: 5px;
+    width: 150px; /* Adjust width for alignment */
+    text-align: left;
+}
+
+.info-title {
+    font-weight: bold;
+}
+
+.info-value {
+    margin-left: auto;
 }
