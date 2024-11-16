@@ -4,6 +4,7 @@ let level = 1;
 let lines = 0;
 let score = 0;
 let paused = false;
+let game_over = false;
 let tick_speed = 100;
 const overlay = document.getElementById('overlay');
 const boardCellsByCoord = {};
@@ -333,21 +334,14 @@ function spawnNewShape() {
     currentY = 0;
     if (!canMoveTo(currentX, currentY) && !isFirstShape) {
         // Game over
-        alert('Game Over!');
-        initializeGame();
+        pause("Game Over!");
+        game_over = true;
     } else {
         drawShape();
         isFirstShape = false;
     }
 }
 
-function OLDgetRandomShape() {
-    const shapeTypes = Object.keys(shapes);
-    let shapeName = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
-    selections[shapeName] ??= 0;
-    selections[shapeName]++;
-    return shapeName
-}
 function getRandomShape() {
     const shapeTypes = Object.keys(shapes);
     const weights = shapeTypes.map(shape => 1 / (selections[shape] || 1));
@@ -367,15 +361,21 @@ window.addEventListener('blur', function () {
     pause();
 });
 
-function pause(){
+function pause(message=null){
+    if(message === null){
+        message = "Paused"
+    }
     overlay.style.display = 'flex';
-    overlay.textContent = "Paused";
+    overlay.textContent = message;
     paused = true;
 }
 
 function unpause(){
     paused = false;
     overlay.style.display = 'none';
+    if(game_over === true){
+        initializeGame();
+    }
 }
 
 function togglePause() {
@@ -435,6 +435,8 @@ function start() {
 }
 
 function clearFullRows() {
+    let linesCleared = 0;
+    let highestY = 0;
     for (let y = 0; y < board_rows; y++) {
         let isFull = true;
         for (let x = 0; x < board_cols; x++) {
@@ -445,6 +447,8 @@ function clearFullRows() {
             }
         }
         if (isFull) {
+            linesCleared++;
+            highestY = y;
             // Clear the full row
             for (let x = 0; x < board_cols; x++) {
                 const cell = getBoardCellByCoord(x, y);
