@@ -17,47 +17,86 @@ body {
     border: 2px solid #111;
     width: 318px; /* columns * (column-width + gap) - gap # one fewer gap */
 }
+
+#game-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+#wrap {
+  padding: 2em;
+}
+
+#info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#preview {
+  display: grid;
+  grid-template-columns: repeat(4, 30px);
+  grid-template-rows: repeat(2, 30px);
+  gap: 2px;
+  padding: 0px;
+  border: 2px solid #111;
+  width: 126px;
+}
+
+#score, #leader_board {
+  color: white;
+  font-size: 18px;
+}
+
+#board-container {
+  position: relative;
+  width: 318px; /* Same as your board width */
+}
+
 #overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    color: white;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    z-index: 10; /* Ensure it is above the board */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 101%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  z-index: 10;
 }
 .cell {
     width: 30px;
     height: 30px;
 }
 .shape-T {
-    background-color: #b23e91;
+    background-color: #c0279a;
 }
 
 .shape-I {
-    background-color: #b24d3e;
+    background-color: #bd4333;
 }
 
 .shape-O {
-    background-color: #b2b03e;
+    background-color: #bdbb27;
 }
 
 .shape-Z {
-    background-color: #51b23e;
+    background-color: #41ad2c;
 }
 
 .shape-L {
-    background-color: #3eb28d;
+    background-color: #29b08a;
 }
 
 .shape-J {
-    background-color: #3e74b2;
+    background-color: #2b73bd;
 }
 
 .shape-S {
-    background-color: #6a3eb2;
+    background-color: #6933bd;
 }
