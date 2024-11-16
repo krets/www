@@ -40,20 +40,54 @@ function copyShape(shape) {
 
 // Function to rotate a shape
 function rotateShape(shapeCoords, rotation) {
-    return shapeCoords.map(([x, y]) => {
+    // Calculate the center of the shape before rotation
+    const center = calculateCenter(shapeCoords);
+
+    // Perform rotation
+    const rotatedCoords = shapeCoords.map(([x, y]) => {
+        // Translate to origin
+        const tx = x - center[0];
+        const ty = y - center[1];
+
+        let rx, ry;
         switch (rotation % 4) {
             case 0: // 0 degrees
-                return [x, y];
+                [rx, ry] = [tx, ty];
+                break;
             case 1: // 90 degrees clockwise
-                return [y, -x];
+                [rx, ry] = [ty, -tx];
+                break;
             case 2: // 180 degrees
-                return [-x, -y];
+                [rx, ry] = [-tx, -ty];
+                break;
             case 3: // 270 degrees clockwise
-                return [-y, x];
+                [rx, ry] = [-ty, tx];
+                break;
         }
+
+        // Translate back and round
+        return [Math.round(rx + center[0]), Math.round(ry + center[1])];
     });
+
+    // Calculate the new center after rotation
+    const newCenter = calculateCenter(rotatedCoords);
+
+    // Adjust coordinates to maintain the original center
+    const adjustment = [
+        Math.round(center[0] - newCenter[0]),
+        Math.round(center[1] - newCenter[1])
+    ];
+
+    return rotatedCoords.map(([x, y]) => [x + adjustment[0], y + adjustment[1]]);
 }
 
+function calculateCenter(coords) {
+    const sum = coords.reduce((acc, [x, y]) => [acc[0] + x, acc[1] + y], [0, 0]);
+    return [
+        Math.round(sum[0] / coords.length),
+        Math.round(sum[1] / coords.length)
+    ];
+}
 
 
 // Function to create a new shape instance
