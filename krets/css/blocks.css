@@ -149,3 +149,19 @@ body {
 .info-value {
     margin-left: auto;
 }
+
+@keyframes pulse {
+    0% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.2);
+    }
+    100% {
+        filter: brightness(1);
+    }
+}
+
+.locked {
+    animation: pulse 0.25s ease-in-out;
+}
