@@ -13,6 +13,8 @@ let currentShape = null;
 let currentX = 0;
 let currentY = 0;
 let isFirstShape = true;
+let lockDelay = 500; // 500 milliseconds (0.5 seconds) delay
+let lockTimer = null;
 
 const shapes = {
     I: [[-1, 0], [0, 0], [1, 0], [2, 0]],
@@ -174,6 +176,7 @@ function moveLeft() {
         clearShape();
         currentX--;
         drawShape();
+        resetLockTimer();
     }
 }
 
@@ -182,18 +185,40 @@ function moveRight() {
         clearShape();
         currentX++;
         drawShape();
+        resetLockTimer();
     }
 }
 
+function resetLockTimer() {
+    if (lockTimer) {
+        clearTimeout(lockTimer);
+        lockTimer = null;
+    }
+    if (!canMoveTo(currentX, currentY + 1)) {
+        lockTimer = setTimeout(() => {
+            lockShape();
+            spawnNewShape();
+            lockTimer = null;
+        }, lockDelay);
+    }
+}
 function moveDown() {
     if (canMoveTo(currentX, currentY + 1)) {
         clearShape();
         currentY++;
         drawShape();
+        if (lockTimer) {
+            clearTimeout(lockTimer);
+            lockTimer = null;
+        }
     } else {
-        // Shape has landed
-        lockShape();
-        spawnNewShape();
+        if (!lockTimer) {
+            lockTimer = setTimeout(() => {
+                lockShape();
+                spawnNewShape();
+                lockTimer = null;
+            }, lockDelay);
+        }
     }
 }
 
@@ -215,6 +240,7 @@ function rotate() {
     }
 
     drawShape();
+    resetLockTimer();
 }
 
 function adjustPosition() {
@@ -305,14 +331,30 @@ function getRandomShape() {
 }
 
 window.addEventListener('blur', function () {
-    overlay.style.display = 'flex'; // Show overlay
-    overlay.textContent = "Paused";
-    paused = true;
+    pause();
 });
 
-document.addEventListener('mousedown', (event) => {
+function pause(){
+    overlay.style.display = 'flex';
+    overlay.textContent = "Paused";
+    paused = true;
+}
+
+function unpause(){
     paused = false;
     overlay.style.display = 'none';
+}
+
+function togglePause() {
+    if (paused) {
+        unpause();
+    } else {
+        pause();
+    }
+}
+
+document.addEventListener('mousedown', (event) => {
+    unpause();
     event.preventDefault();
 });
 // Keyboard controls
@@ -338,6 +380,9 @@ document.addEventListener('keydown', (event) => {
         case 'ArrowUp':
         case 'w':
             rotate();
+            break;
+        case 'Escape':
+            togglePause();
             break;
     }
 });
