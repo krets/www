@@ -102,3 +102,23 @@ body {
 .shape-S {
     background-color: #6933bd;
 }
+
+.point {
+  position: absolute;
+  font-size: 19px;
+  color: #ffffff;
+  animation: moveUpFadeOut 1s cubic-bezier(.1,.94,.82,1.05) forwards;
+}
+
+@keyframes moveUpFadeOut {
+  0% {
+    bottom: 0px;
+    left: 0px;
+    opacity: 1;
+  }
+  100% {
+    bottom: var(--random-bottom);
+    left: var(--random-left);
+    opacity: 0;
+  }
+}

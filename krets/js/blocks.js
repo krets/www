@@ -19,6 +19,10 @@ let isFirstShape = true;
 let lockDelay = 500; // 500 milliseconds (0.5 seconds) delay
 let lockTimer = null;
 
+// points per line clear
+const linePoints = [ 40, 100, 300, 1200 ]
+
+
 const shapes = {
     I: [[-1, 0], [0, 0], [1, 0], [2, 0]],
     O: [[0, 0], [1, 0], [0, 1], [1, 1]],
@@ -476,5 +480,31 @@ function clearFullRows() {
             // Check the same row again as it now contains the row above
             y--;
         }
+        if (linesCleared > 0) {
+            lines += linesCleared;
+            let newPoints = linePoints[linesCleared - 1] * level;
+            animatePoints(newPoints);
+            score += newPoints
+        }
     }
+}
+function animatePoints(value) {
+  const rect = getBoardCellByCoord(0, 0).getBoundingClientRect();
+  const board = document.getElementById('board-container');
+  const pointElement = document.createElement('div');
+  pointElement.className = 'point';
+  pointElement.textContent = value;
+
+  const randomLeft = 100 + Math.floor(Math.random() * board.getBoundingClientRect().width);
+  const randomBottom = 100 + Math.floor(Math.random() * (board.getBoundingClientRect().height - 200));
+
+  // Set custom animation with random final positions
+  pointElement.style.animation = `moveUpFadeOut 1s cubic-bezier(.1,.94,.82,1.05) forwards`;
+  pointElement.style.setProperty('--random-left', `${randomLeft}px`);
+  pointElement.style.setProperty('--random-bottom', `${randomBottom}px`);
+
+  board.appendChild(pointElement);
+  pointElement.addEventListener('animationend', () => {
+    board.removeChild(pointElement);
+  });
 }
