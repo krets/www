@@ -70,7 +70,7 @@ function createShape(shape) {
 // Function to rotate a shape instance
 function rotateShapeInstance(shapeInstance) {
     shapeInstance.rotation = (shapeInstance.rotation + 1) % 4;
-    shapeInstance.coords = rotateShape(shapeInstance.coords, shapeInstance.rotation);
+    shapeInstance.coords = rotateShape(shapeInstance.coords, 1);
 }
 
 function drawShape() {
