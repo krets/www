@@ -396,20 +396,20 @@ input:focus {
     flex-direction: column;
     align-items: center;
     position: fixed;
-    bottom: 0;
+    top: 50%;
     left: 0;
-    margin: 2vw; /* Example using viewport width */
+    margin: 2vw;
     z-index: 20;
 }
 
 #controls button {
     width: 15vw;
-    height: 13vh;
-    margin: 2vw; /* Example using viewport width */
+    height: 15vw;
+    margin: 2vw;
     padding: 0;
     background-color: rgba(0,0,0,0.1);
     border: solid 2px #ccc;
-    border-radius: 1em;
+    border-radius: 0.5em;
     font-size: 2em;
     cursor: pointer;
     color: white;
@@ -418,8 +418,8 @@ input:focus {
 
 button#space {
     width: 10vw;
-    height: 10vh;
-    margin: 2vw 1vw; /* Example using viewport width */
+    height: 10vw;
+    margin: 2vw 1vw;
 }
 
 #controls button:hover {
@@ -433,33 +433,55 @@ button#space {
 }
 
 @media (max-width: 600px) {
-    .cell {
-        width: 15px;
-        height: 15px;
-    }
     .meter-square {
-        width: 4px;
-        height: 4px;
-    }
-    #board {
-        grid-template-columns: repeat(10, 15px);
-        grid-template-rows: repeat(20, 15px);
-        width: 168px; /* Adjusted for new cell size and gaps */
-    }
-
-    #preview {
-        grid-template-columns: repeat(4, 15px);
-        grid-template-rows: repeat(2, 15px);
-        width: 52px; /* Adjusted for new cell size and gaps */
-    }
-    #board-container{
-        width: 170px;
+        width: 2px;
+        height: 2px;
+        padding: 0;
+        margin: 0;
     }
     #game-container {
-        flex-direction: column;
-        align-items: center;
+        flex-wrap: wrap;
+        /*align-items: center;*/
     }
+
     #info {
         border-radius: 20px;
+        margin: 2px;
+        padding: 2px;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .info-title,
+    .info-value,
+    .info-item {
+        width: 3em;
+        margin: 0.2em;
+        padding: 0;
+        font-weight: normal;
+        text-align: center;
+        justify-content: normal;
+    }
+    #level-meter {
+        display: flex;
+        flex-direction: column-reverse;
+        /*display: none;*/
+    }
+    #preview {
+        padding: 4px;
+        flex: 3;
+    }
+    #leader_board {
+
+    }
+    #score-details {
+        display: flex;
+        flex-wrap: wrap;
+        justify-items: auto;
+    }
+    #level-meter {
+        flex: 3;
+        margin: auto;
+        width: auto;
     }
 }
