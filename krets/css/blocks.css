@@ -391,19 +391,20 @@ input:focus {
     z-index: 20;
 }
 
-#controls div {
+#controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     display: flex;
-    justify-content: center;
-
+    justify-content: left;
 }
-
 
 #controls button {
     width: 4em;
     height: 4em;
     margin: 0.1em;
     padding: 10px;
-    background-color: transparent;
+    background-color: transparent !important;
     border: solid 2px #ccc;
     border-radius: 1em;
     font-size: 2em;
