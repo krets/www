@@ -1,7 +1,8 @@
 /*
 ToDo:
  - Background Generator
- - High-Scores
+ - optional ghostblock
+ - better colors for triangle and graph board.
  */
 const board_rows = 20;
 const board_cols = 10;
@@ -180,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function updateInfo() {
-    document.getElementById("game-container").classList.add(`level-${level}`)
+    document.getElementById("game-container").className = `level-${level}`;
     document.getElementById("score-value").textContent = score;
     document.getElementById("lines-value").textContent = lines;
     document.getElementById("level-value").textContent = level;
@@ -348,6 +349,9 @@ function lockShape() {
 }
 
 function spawnNewShape() {
+    if (game_over){
+        return;
+    }
     if (nextShape === null){
         nextShape = createShape(getRandomShape());
     }

@@ -193,7 +193,11 @@ body {
     /* Cutting matt */
     background-color: rgba(25, 47, 38, 1);
     opacity: 1;
-    background-image:  linear-gradient(#28433d 3.2px, transparent 3.2px), linear-gradient(90deg, #28433d 3.2px, transparent 3.2px), linear-gradient(#28433d 1.6px, transparent 1.6px), linear-gradient(90deg, #28433d 1.6px, rgba(25, 47, 38, 1) 1.6px);
+    background-image:
+            linear-gradient(#233b36 3.2px, transparent 3.2px),
+            linear-gradient(90deg, #233b36 3.2px, transparent 3.2px),
+            linear-gradient(#233b36 1.6px, transparent 1.6px),
+            linear-gradient(90deg, #233b36 1.6px, rgba(25, 47, 38, 1) 1.6px);
     background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
     background-position: -3.2px -3.2px, -3.2px -3.2px, -1.6px -1.6px, -1.6px -1.6px;
 }
