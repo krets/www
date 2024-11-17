@@ -31,11 +31,11 @@ body {
 }
 
 #info {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     background: #1e1e1e;
-        border-top-right-radius: 20px;
+    border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
 }
 
@@ -358,4 +358,24 @@ input:focus {
     font-size: 120%;
     color: #FC0;
     font-weight: bold;
+}
+
+.info-meter {
+    padding-top: .7em;
+    margin-bottom: -8px;
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    margin-top: 5px;
+}
+.meter-square {
+    display: flex;
+    width: 10px;
+    height: 10px;
+    margin: 2px;
+    background-color: lightgray;
+    clear:left;
+}
+.meter-square.active {
+    background-color: green;
 }

@@ -184,9 +184,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function updateInfo() {
     document.getElementById("game-container").className = `level-${level}`;
+    updateLevelMeter();
     document.getElementById("score-value").textContent = score;
     document.getElementById("lines-value").textContent = lines;
     document.getElementById("level-value").textContent = level;
+}
+
+function updateLevelMeter() {
+    const meter = document.getElementById('level-meter');
+    meter.innerHTML = ''; // Clear existing squares
+    let remainder = lines % lines_per_level;
+    for (let i = 0; i < lines_per_level; i++) {
+        const square = document.createElement('div');
+        square.classList.add('meter-square');
+        if (i < remainder) {
+            square.classList.add('active');
+        }
+        meter.appendChild(square);
+    }
 }
 
 function createBoard(container, rows, cols, cellsObject) {
