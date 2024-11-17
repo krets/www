@@ -134,6 +134,7 @@ function drawShape() {
             cell.classList.add('shape-' + currentShape.type);
         }
     });
+    renderGhostShape();
 }
 
 function drawPreview() {
@@ -446,6 +447,39 @@ function moveToBottom() {
     }
     lockShape();
     spawnNewShape();
+}
+
+
+function calculateBottomPosition() {
+    let ghostY = currentY;
+    while (canMoveTo(currentX, ghostY + 1)) {
+        ghostY++;
+    }
+    return ghostY;
+}
+
+function renderGhostShape() {
+    // First, clear any existing ghost shape
+    clearGhostShape();
+
+    // Calculate the bottom position
+    const ghostY = calculateBottomPosition();
+
+    // Add the .ghost class to the cells at the bottom position
+    currentShape.coords.forEach(([dx, dy]) => {
+        const x = currentX + dx;
+        const y = ghostY + dy;
+        const cell = getBoardCellByCoord(x, y);
+        if (cell) {
+            cell.classList.add('ghost');
+        }
+    });
+}
+
+function clearGhostShape() {
+    forEachCell(boardCellsByCoord, (cell) => {
+        cell.classList.remove('ghost');
+    });
 }
 
 // Optional: Add a game loop for continuous downward movement

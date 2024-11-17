@@ -76,31 +76,42 @@ body {
     height: 30px;
 }
 .shape-T {
-    background-color: #c0279a;
+    background-color: #c0279a !important;
+    z-index: 10;
 }
 
 .shape-I {
-    background-color: #bd4333;
+    background-color: #bd4333 !important;
+    z-index: 10;
 }
 
 .shape-O {
-    background-color: #bdbb27;
+    background-color: #bdbb27 !important;
+    z-index: 10;
 }
 
 .shape-Z {
-    background-color: #41ad2c;
+    background-color: #41ad2c !important;
+    z-index: 10;
 }
 
 .shape-L {
-    background-color: #29b08a;
+    background-color: #29b08a !important;
+    z-index: 10;
 }
 
 .shape-J {
-    background-color: #2b73bd;
+    background-color: #2b73bd !important;
+    z-index: 10;
 }
 
 .shape-S {
-    background-color: #6933bd;
+    background-color: #6933bd !important;
+    z-index: 10;
+}
+
+.cell.ghost {
+    background-color: rgba(157, 157, 87, 0.10);
 }
 
 .point {
