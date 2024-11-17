@@ -482,14 +482,16 @@ function clearGhostShape() {
     });
 }
 
-// Optional: Add a game loop for continuous downward movement
 function getTimeout() {
-    // Ensure the level does not exceed 10
-    if (level >= 10) {
-        return 0;
+    // Calculate timeout decreasing linearly from max_timeout to min_timeout
+    // don't exceed fastest_level.
+    const max_timeout = 1000;
+    const min_timeout = 50;
+    const fastest_level = 10;
+    if (level >= fastest_level) {
+        return min_timeout;
     }
-    // Calculate timeout decreasing linearly from 1000 to 0
-    return 1000 - ((level - 1) * (1000 / 9)); // 9 intervals from level 1 to 10
+    return max_timeout - ((level - 1) * ((max_timeout-min_timeout) / (fastest_level - 1)));
 }
 
 function gameLoop() {
