@@ -1,8 +1,6 @@
 /*
 ToDo:
  - Background Generator
- - optional ghostblock
- - better colors for triangle and graph board.
  */
 const board_rows = 20;
 const board_cols = 10;
@@ -178,6 +176,10 @@ document.addEventListener("DOMContentLoaded", function() {
     initializeGame();
     updateLeaderBoard();
     setTimeout(gameLoop, 1000);
+
+    document.getElementById('ghost_checkbox').addEventListener('change', function() {
+        renderGhostShape();
+    });
 });
 
 function updateInfo() {
@@ -450,7 +452,12 @@ document.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'a', 'd', 's', 'w', ' '].includes(event.key)) {
         event.preventDefault();
     }
-
+    if (event.key === 'Escape') {
+        togglePause();
+    }
+    if(paused){
+        return;
+    }
     switch (event.key) {
         case 'ArrowLeft':
         case 'a':
@@ -467,9 +474,6 @@ document.addEventListener('keydown', (event) => {
         case 'ArrowUp':
         case 'w':
             rotate();
-            break;
-        case 'Escape':
-            togglePause();
             break;
         case ' ':
             moveToBottom();
@@ -500,6 +504,10 @@ function calculateBottomPosition() {
 function renderGhostShape() {
     // First, clear any existing ghost shape
     clearGhostShape();
+
+    if (!document.getElementById('ghost_checkbox').checked){
+        return;
+    }
 
     // Calculate the bottom position
     const ghostY = calculateBottomPosition();

@@ -2,6 +2,7 @@ body {
     margin:0;
     padding: .5em;
     background-color: #222;
+    color: white;
     font-family: "Geo", sans-serif;
 }
 #wrap {
@@ -319,4 +320,26 @@ body {
     background-image:  radial-gradient(#1f4457 2px, transparent 2px), radial-gradient(#1f4457 2px, rgba(23, 39, 46, 1) 2px);
     background-size: 80px 80px;
     background-position: 0 0,40px 40px;
+}
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    background-color: #333;
+    border: 2px dotted #666;
+    cursor: pointer;
+    position: relative;
+    top: 4px;
+}
+
+input[type="checkbox"]:checked {
+    background-color: white;
+    border: 2px solid black;
+}
+label {
+    cursor: pointer;
+}
+input:focus {
+    outline: none;
 }
