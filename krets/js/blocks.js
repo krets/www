@@ -407,8 +407,7 @@ document.addEventListener('mousedown', (event) => {
 });
 // Keyboard controls
 document.addEventListener('keydown', (event) => {
-    // Prevent default behavior for arrow keys and WASD
-    if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'a', 'd', 's', 'w'].includes(event.key)) {
+    if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'a', 'd', 's', 'w', ' '].includes(event.key)) {
         event.preventDefault();
     }
 
@@ -432,8 +431,22 @@ document.addEventListener('keydown', (event) => {
         case 'Escape':
             togglePause();
             break;
+        case ' ':
+            moveToBottom();
+            break;
     }
 });
+
+// Implement the moveToBottom function
+function moveToBottom() {
+    while (canMoveTo(currentX, currentY + 1)) {
+        clearShape();
+        currentY++;
+        drawShape();
+    }
+    lockShape();
+    spawnNewShape();
+}
 
 // Optional: Add a game loop for continuous downward movement
 function getTimeout() {
