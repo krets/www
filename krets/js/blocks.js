@@ -193,8 +193,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     for (const [id, action] of Object.entries(buttonActions)) {
         const element = document.getElementById(id);
-        element.addEventListener('click', action);
-        element.addEventListener('click', unpause);
         element.addEventListener('touchend', action);
         element.addEventListener('touchend', unpause);
     }
