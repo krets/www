@@ -379,3 +379,51 @@ input:focus {
 .meter-square.active {
     background-color: green;
 }
+
+#controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin: 2em;
+    z-index: 20;
+}
+
+#controls div {
+    display: flex;
+    justify-content: center;
+
+}
+
+
+#controls button {
+    width: 4em;
+    height: 4em;
+    margin: 0.1em;
+    padding: 10px;
+    background-color: transparent;
+    border: solid 2px #ccc;
+    border-radius: 1em;
+    font-size: 2em;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+button#space {
+    width: 2.5em;
+    height: 2.5em;
+    margin: 1em 0.5em;
+}
+
+#controls button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+}
+
+#controls button:active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: #aaa;
+}

@@ -175,11 +175,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
     initializeGame();
     updateLeaderBoard();
-    setTimeout(gameLoop, 1000);
+    setTimeout(gameLoop, getTimeout());
 
     document.getElementById('ghost_checkbox').addEventListener('change', function() {
         renderGhostShape();
     });
+    // if (!('ontouchstart' in window || navigator.maxTouchPoints)) {
+    //     document.getElementById('controls').style.display = 'none';
+    // }
+    const buttonActions = {
+        'up': rotate,
+        'left': moveLeft,
+        'space': moveToBottom,
+        'right': moveRight,
+        'down': moveDown
+    };
+
+    for (const [id, action] of Object.entries(buttonActions)) {
+        const element = document.getElementById(id);
+        element.addEventListener('click', action);
+        element.addEventListener('click', unpause);
+        element.addEventListener('touchstart', action);
+        element.addEventListener('touchstart', unpause);
+    }
+    if (!document.hasFocus()) {
+        pause()
+    }
 });
 
 function updateInfo() {
