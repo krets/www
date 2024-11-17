@@ -551,29 +551,20 @@ function clearFullRows() {
     if (linesCleared > 0) {
         lines += linesCleared;
         let newPoints = linePoints[linesCleared - 1] * level;
-        animatePoints(newPoints);
         score += newPoints;
         level = Math.floor(lines / 10) + 1;
         updateInfo();
+        animatePoints(newPoints);
     }
 }
 function animatePoints(value) {
-  const rect = getBoardCellByCoord(0, 0).getBoundingClientRect();
-  const board = document.getElementById('board-container');
+  const container = document.getElementById('score-value');
   const pointElement = document.createElement('div');
   pointElement.className = 'point';
   pointElement.textContent = value;
 
-  const randomLeft = 100 + Math.floor(Math.random() * board.getBoundingClientRect().width);
-  const randomBottom = 100 + Math.floor(Math.random() * (board.getBoundingClientRect().height - 200));
-
-  // Set custom animation with random final positions
-  pointElement.style.animation = `moveUpFadeOut 1s cubic-bezier(.1,.94,.82,1.05) forwards`;
-  pointElement.style.setProperty('--random-left', `${randomLeft}px`);
-  pointElement.style.setProperty('--random-bottom', `${randomBottom}px`);
-
-  board.appendChild(pointElement);
+  container.appendChild(pointElement);
   pointElement.addEventListener('animationend', () => {
-    board.removeChild(pointElement);
+    container.removeChild(pointElement);
   });
 }
