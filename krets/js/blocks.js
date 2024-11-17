@@ -1,3 +1,8 @@
+/*
+ToDo:
+ - Background Generator
+ - High-Scores
+ */
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -6,10 +11,11 @@ let score = 0;
 let paused = false;
 let game_over = false;
 let tick_speed = 100;
+const lines_per_level = 10;
 const overlay = document.getElementById('overlay');
 const boardCellsByCoord = {};
 const previewCellsByCoord = {};
-
+const leaderBoardKey = "leader_board";
 
 let nextShape = null;
 let currentShape = null;
@@ -169,10 +175,12 @@ document.addEventListener("DOMContentLoaded", function() {
     createBoard(preview, 2, 4, previewCellsByCoord);
 
     initializeGame();
-    start();
+    updateLeaderBoard();
+    setTimeout(gameLoop, 1000);
 });
 
 function updateInfo() {
+    document.getElementById("game-container").classList.add(`level-${level}`)
     document.getElementById("score-value").textContent = score;
     document.getElementById("lines-value").textContent = lines;
     document.getElementById("level-value").textContent = level;
@@ -350,12 +358,36 @@ function spawnNewShape() {
     currentY = 0;
     if (!canMoveTo(currentX, currentY) && !isFirstShape) {
         // Game over
-        pause("Game Over!");
-        game_over = true;
+        endGame();
     } else {
         drawShape();
         isFirstShape = false;
     }
+}
+
+function endGame(){
+    pause("Game Over!");
+    game_over = true;
+    updateLeaderBoard();
+}
+
+function updateLeaderBoard(){
+    const scores = JSON.parse(localStorage.getItem(leaderBoardKey)) || [];
+    if (score > 0){
+        scores.push(score);
+    }
+    scores.sort((a, b) => b - a); // Sort scores in descending order
+    localStorage.setItem(leaderBoardKey, JSON.stringify(scores));
+    const leaderBoardDiv = document.getElementById('leader_board');
+    leaderBoardDiv.innerHTML = '';
+
+    const list = document.createElement('ol');
+    leaderBoardDiv.appendChild(list);
+    scores.slice(0, 10).forEach(score => {
+        const listItem = document.createElement('li');
+        listItem.textContent = score;
+        list.appendChild(listItem);
+    });
 }
 
 function getRandomShape() {
@@ -407,7 +439,6 @@ document.getElementById('overlay').addEventListener('mousedown', (event) => {
 });
 
 document.addEventListener('mousedown', (event) => {
-    unpause();
     event.preventDefault();
 });
 // Keyboard controls
@@ -506,11 +537,6 @@ function gameLoop() {
     setTimeout(gameLoop, getTimeout());
 }
 
-
-function start() {
-    setTimeout(gameLoop, 1000);
-}
-
 function clearFullRows() {
     let linesCleared = 0;
     let highestY = 0;
@@ -558,7 +584,7 @@ function clearFullRows() {
         lines += linesCleared;
         let newPoints = linePoints[linesCleared - 1] * level;
         score += newPoints;
-        level = Math.floor(lines / 10) + 1;
+        level = Math.floor(lines / lines_per_level) + 1;
         updateInfo();
         animatePoints(newPoints);
     }
