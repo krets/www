@@ -51,7 +51,7 @@ body {
 
 #score, #leader_board {
   color: white;
-  font-size: 18px;
+  font-size: 18pt;
 }
 
 #board-container {
@@ -70,7 +70,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 24pt;
   z-index: 10;
 }
 .cell {
@@ -122,7 +122,7 @@ body {
 
 .point {
   position: absolute;
-  font-size: 19px;
+  font-size: 19pt;
   color: #ffffff;
   animation: moveUpFadeOut 1.25s cubic-bezier(.1,.94,.82,1.05) forwards;
   left: 0;
@@ -150,7 +150,7 @@ body {
 .info-item {
     display: flex;
     justify-content: space-between;
-    font-size: 20px;
+    font-size: 20pt;
     margin: 5px;
     padding: 10px;
     color: white;
@@ -430,4 +430,36 @@ button#space {
 #controls button:active {
     background-color: rgba(255, 255, 255, 0.2);
     border-color: #aaa;
+}
+
+@media (max-width: 600px) {
+    .cell {
+        width: 15px;
+        height: 15px;
+    }
+    .meter-square {
+        width: 4px;
+        height: 4px;
+    }
+    #board {
+        grid-template-columns: repeat(10, 15px);
+        grid-template-rows: repeat(20, 15px);
+        width: 168px; /* Adjusted for new cell size and gaps */
+    }
+
+    #preview {
+        grid-template-columns: repeat(4, 15px);
+        grid-template-rows: repeat(2, 15px);
+        width: 52px; /* Adjusted for new cell size and gaps */
+    }
+    #board-container{
+        width: 170px;
+    }
+    #game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    #info {
+        border-radius: 20px;
+    }
 }
