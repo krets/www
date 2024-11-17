@@ -439,10 +439,10 @@ button#space {
         grid-template-columns: repeat(10, 20px);
         grid-template-rows: repeat(20, 20px);
         gap: 1px;
-        width: 219px; /* columns * (column-width + gap) - gap # one fewer gap */
+        width: 209px; /* columns * (column-width + gap) - gap # one fewer gap */
     }
     #board-container {
-        width: 219px;
+        width: 209px;
     }
 
     #info {
