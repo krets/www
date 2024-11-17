@@ -249,39 +249,6 @@ function moveRight() {
     }
 }
 
-function resetLockTimer() {
-    if (lockTimer) {
-        clearTimeout(lockTimer);
-        lockTimer = null;
-    }
-    if (!canMoveTo(currentX, currentY + 1)) {
-        lockTimer = setTimeout(() => {
-            lockShape();
-            spawnNewShape();
-            lockTimer = null;
-        }, lockDelay);
-    }
-}
-function moveDown() {
-    if (canMoveTo(currentX, currentY + 1)) {
-        clearShape();
-        currentY++;
-        drawShape();
-        if (lockTimer) {
-            clearTimeout(lockTimer);
-            lockTimer = null;
-        }
-    } else {
-        if (!lockTimer) {
-            lockTimer = setTimeout(() => {
-                lockShape();
-                spawnNewShape();
-                lockTimer = null;
-            }, lockDelay);
-        }
-    }
-}
-
 function rotate() {
     clearShape();
 
@@ -301,6 +268,28 @@ function rotate() {
 
     drawShape();
     resetLockTimer();
+}
+
+function moveDown() {
+    if (canMoveTo(currentX, currentY + 1)) {
+        clearShape();
+        currentY++;
+        drawShape();
+        resetLockTimer();
+    }
+}
+
+function resetLockTimer() {
+    if (lockTimer) {
+        clearTimeout(lockTimer);
+        lockTimer = null;
+    }
+    if (!canMoveTo(currentX, currentY + 1)) {
+        lockTimer = setTimeout(() => {
+            lockShape();
+            lockTimer = null;
+        }, lockDelay);
+    }
 }
 
 function adjustPosition() {
@@ -348,6 +337,7 @@ function lockShape() {
         }
     });
     clearFullRows();
+    spawnNewShape();
 }
 
 function spawnNewShape() {
@@ -372,13 +362,35 @@ function spawnNewShape() {
 }
 
 function endGame(){
-    pause("Game Over!");
     game_over = true;
-    updateLeaderBoard();
+
+    const final_screen = document.createElement('div');
+    const heading = document.createElement('div');
+    const subheading = document.createElement('div');
+    const bonusheading = document.createElement('div');
+    final_screen.appendChild(heading);
+    final_screen.appendChild(subheading);
+    final_screen.appendChild(bonusheading);
+    final_screen.id = 'final_screen';
+    heading.className = 'title';
+    subheading.className = 'subtitle';
+    bonusheading.className = 'bonustitle';
+
+    heading.innerText = "Game Over!"
+    subheading.innerText = `Score: ${score}`;
+
+    const newTopScore = updateLeaderBoard();
+    if(newTopScore === true){
+        bonusheading.innerText = "New high score!"
+    }
+
+    pause(final_screen);
+
 }
 
 function updateLeaderBoard(){
     const scores = JSON.parse(localStorage.getItem(leaderBoardKey)) || [];
+    const isTopScore = score > Math.max(...scores);
     if (score > 0){
         scores.push(score);
     }
@@ -394,6 +406,7 @@ function updateLeaderBoard(){
         listItem.textContent = score;
         list.appendChild(listItem);
     });
+    return isTopScore;
 }
 
 function getRandomShape() {
@@ -415,15 +428,20 @@ window.addEventListener('blur', function () {
     pause();
 });
 
-function pause(message=null){
-    if(message === null){
-        message = "Paused"
+function pause(message = null) {
+    if (paused === true) {
+        return;
     }
     overlay.style.display = 'flex';
-    overlay.textContent = message;
+    overlay.textContent = '';
+    if (message === null) {
+        message = document.createTextNode("Paused");
+    } else if (!(message instanceof HTMLElement)) {
+        message = document.createTextNode(message);
+    }
+    overlay.appendChild(message);
     paused = true;
 }
-
 function unpause(){
     paused = false;
     overlay.style.display = 'none';
@@ -489,7 +507,6 @@ function moveToBottom() {
         drawShape();
     }
     lockShape();
-    spawnNewShape();
 }
 
 

@@ -343,3 +343,19 @@ label {
 input:focus {
     outline: none;
 }
+
+#final_screen {
+    justify-content: center;
+    text-align: center;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 0.5em;
+    padding: 0.5em;
+}
+#final_screen .title {
+    font-size: 120%;
+}
+#final_screen .bonustitle {
+    font-size: 120%;
+    color: #FC0;
+    font-weight: bold;
+}
