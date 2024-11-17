@@ -391,8 +391,6 @@ input:focus {
     z-index: 20;
 }
 
-css
-Copy code
 #controls {
     display: flex;
     flex-direction: column;
