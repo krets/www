@@ -214,6 +214,7 @@ function initializeGame() {
     points = 0;
     level = 1;
     isFirstShape = true;
+    game_over = false;
     updateInfo()
     spawnNewShape();
 }
