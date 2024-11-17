@@ -195,8 +195,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const element = document.getElementById(id);
         element.addEventListener('click', action);
         element.addEventListener('click', unpause);
-        element.addEventListener('touchstart', action);
-        element.addEventListener('touchstart', unpause);
+        element.addEventListener('touchend', action);
+        element.addEventListener('touchend', unpause);
     }
     if (!document.hasFocus()) {
         pause()
