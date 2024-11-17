@@ -402,6 +402,10 @@ function togglePause() {
     }
 }
 
+document.getElementById('overlay').addEventListener('mousedown', (event) => {
+    unpause();
+});
+
 document.addEventListener('mousedown', (event) => {
     unpause();
     event.preventDefault();
