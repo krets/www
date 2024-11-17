@@ -381,22 +381,11 @@ input:focus {
 }
 
 #controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    margin: 2em;
-    z-index: 20;
-}
-
-#controls {
     display: none;
     flex-direction: column;
     align-items: center;
     position: fixed;
-    top: 50%;
+    bottom: 0;
     left: 0;
     margin: 2vw;
     z-index: 20;
