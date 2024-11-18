@@ -386,6 +386,7 @@ function spawnNewShape() {
     drawPreview();
     currentX = Math.floor(board_cols / 2) - 1;
     currentY = 0;
+    resetLockTimer();
     if (!canMoveTo(currentX, currentY) && !isFirstShape) {
         // Game over
         endGame();
