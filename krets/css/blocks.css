@@ -217,91 +217,170 @@ background-image: repeating-linear-gradient(
     background-color: #1a2c41;
     background-image: none;
 }
+#game-container.level-3 #board-guides {
+    opacity: 0;
+}
 #game-container.level-3 #board {
     /* Cutting matt */
     background-color: rgba(25, 47, 38, 1);
     opacity: 1;
     background-image:
-            linear-gradient(#233b36 3.2px, transparent 3.2px),
-            linear-gradient(90deg, #233b36 3.2px, transparent 3.2px),
-            linear-gradient(#233b36 1.6px, transparent 1.6px),
-            linear-gradient(90deg, #233b36 1.6px, rgba(25, 47, 38, 1) 1.6px);
-    background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
-    background-position: -3.2px -3.2px, -3.2px -3.2px, -1.6px -1.6px, -1.6px -1.6px;
+            linear-gradient(#233b36 calc(var(--cell-size)/10), transparent calc(var(--cell-size)/10)),
+            linear-gradient(90deg, #233b36 calc(var(--cell-size)/10), transparent calc(var(--cell-size)/10)),
+            linear-gradient(#233b36 calc(var(--cell-size)/20), transparent calc(var(--cell-size)/20)),
+            linear-gradient(90deg, #233b36 calc(var(--cell-size)/20), rgba(25, 47, 38, 1) calc(var(--cell-size)/20));
+    background-size:
+            calc(var(--cell-size)*2) calc(var(--cell-size)*2),
+            calc(var(--cell-size)*2) calc(var(--cell-size)*2),
+            calc(var(--cell-size)/2) calc(var(--cell-size)/2),
+            calc(var(--cell-size)/2) calc(var(--cell-size)/2);
+    background-position:
+            calc(var(--cell-size)/-10) calc(var(--cell-size)/-10),
+            calc(var(--cell-size)/-10) calc(var(--cell-size)/-10),
+            calc(var(--cell-size)/-20) calc(var(--cell-size)/-20),
+            calc(var(--cell-size)/-20) calc(var(--cell-size)/-20);
+}
+#game-container.level-4 #board-guides {
+    opacity: 0.08;
 }
 #game-container.level-4 #board {
     /* Diag TL -> BR */
-    background-color: #2a3014;
     opacity: 1;
-    background: repeating-linear-gradient(45deg, #39440e, #39440e 3.5px, #2a3014 3.5px, #2a3014 17.5px);
+    background: repeating-linear-gradient(
+        45deg,
+        #39440e,
+        #39440e calc(var(--cell-size)/10),
+        #2a3014 calc(var(--cell-size)/10),
+        #2a3014 calc(var(--cell-size)/2)
+    );
     background-size: auto;
+}
+#game-container.level-4 #board-guides {
+    opacity: 0;
 }
 #game-container.level-5 #board {
     /* triangles */
     background-color: rgba(23, 46, 45, 1);
     opacity: 1;
     background-image: linear-gradient(45deg, #1f5748 50%, rgba(23, 46, 45, 1) 50%);
-    background-size: 17px 17px;
+    background-size:
+        calc((var(--cell-size) + var(--gap-size))/2)
+        calc((var(--cell-size) + var(--gap-size))/2);
+}
+#game-container.level-6 #board-guides {
+    opacity: 0.08;
 }
 #game-container.level-6 #board {
     /* concentric circles from top left */
     background-color: #30142d;
     opacity: 1;
-    background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #30142d 12px ), repeating-linear-gradient( #442b4655, #442b46 );
+    background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #30142d calc(var(--cell-size)/3) ), repeating-linear-gradient( #442b4655, #442b46 );
     background-size: auto;
+}
+#game-container.level-7 #board-guides {
+    opacity: 0;
 }
 #game-container.level-7 #board {
     /* diamonds gingham */
     background-color: rgba(46, 43, 23, 1);
     opacity: 1;
     background-image:  linear-gradient(135deg, #343a17 25%, transparent 25%), linear-gradient(225deg, #343a17 25%, transparent 25%), linear-gradient(45deg, #343a17 25%, transparent 25%), linear-gradient(315deg, #343a17 25%, rgba(46, 43, 23, 1) 25%);
-    background-position:  28px 0, 28px 0, 0 0, 0 0;
-    background-size: 28px 28px;
+    background-position:  var(--cell-size) 0, var(--cell-size) 0, 0 0, 0 0;
+    background-size: var(--cell-size) var(--cell-size);
     background-repeat: repeat;
+}
+#game-container.level-8 #board-guides {
+    opacity: 0;
 }
 #game-container.level-8 #board {
     /* zig-zag */
     background-color: rgba(23, 46, 40, 1);
     opacity: 1;
-    background-image:  linear-gradient(135deg, #173b36 25%, transparent 25%), linear-gradient(225deg, #173b36 25%, transparent 25%), linear-gradient(45deg, #173b36 25%, transparent 25%), linear-gradient(315deg, #173b36 25%, rgba(23, 46, 40, 1) 25%);
-    background-position:  16px 0, 16px 0, 0 0, 0 0;
-    background-size: 32px 32px;
+    background-image:
+            linear-gradient(135deg, #173b36 25%, transparent 25%),
+            linear-gradient(225deg, #173b36 25%, transparent 25%),
+            linear-gradient(45deg, #173b36 25%, transparent 25%),
+            linear-gradient(315deg, #173b36 25%,
+            rgba(23, 46, 40, 1) 25%);
+    background-position:
+            calc(var(--cell-size)/2) 0,
+            calc(var(--cell-size)/2) 0,
+            0 0,
+            0 0;
+    background-size: var(--cell-size) var(--cell-size);
     background-repeat: repeat;
+}
+#game-container.level-9 #board-guides {
+    opacity: 0;
 }
 #game-container.level-9 #board {
     /* 3d cubs */
     background-color: rgba(32, 23, 46, 1);
     opacity: 1;
-    background-image:  linear-gradient(30deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57), linear-gradient(150deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57), linear-gradient(30deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57), linear-gradient(150deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57), linear-gradient(60deg, #311f5777 25%, transparent 25.5%, transparent 75%, #311f5777 75%, #311f5777), linear-gradient(60deg, #311f5777 25%, transparent 25.5%, transparent 75%, #311f5777 75%, #311f5777);
-    background-size: 32px 56px;
-    background-position: 0 0, 0 0, 16px 28px, 16px 28px, 0 0, 16px 28px;
+    background-image:
+        linear-gradient(30deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
+        linear-gradient(150deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
+        linear-gradient(30deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
+        linear-gradient(150deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
+        linear-gradient(60deg, #311f5777 25%, transparent 25.5%, transparent 75%, #311f5777 75%, #311f5777),
+        linear-gradient(60deg, #311f5777 25%, transparent 25.5%, transparent 75%, #311f5777 75%, #311f5777);
+    background-size: var(--cell-size) calc(1.75*var(--cell-size));
+    background-position:
+            0 0,
+            0 0,
+            calc(var(--cell-size)/2) calc(var(--cell-size)*0.875),
+            calc(var(--cell-size)/2) calc(var(--cell-size)*0.875),
+            0 0,
+            calc(var(--cell-size)/2) calc(var(--cell-size)*0.875);
+}
+#game-container.level-10 #board-guides {
+    opacity: 0;
 }
 #game-container.level-10 #board {
     /* checker */
     background-color: rgba(46, 23, 23, 1);
     opacity: 1;
     background-image:  repeating-linear-gradient(45deg, #571f1f 25%, transparent 25%, transparent 75%, #571f1f 75%, #571f1f), repeating-linear-gradient(45deg, #571f1f 25%, rgba(46, 23, 23, 1) 25%, rgba(46, 23, 23, 1) 75%, #571f1f 75%, #571f1f);
-    background-position: 0 0, 10px 10px;
-    background-size: 20px 20px;
+    background-position: 0 0, calc(var(--cell-size)/3) calc(var(--cell-size)/3);
+    background-size: calc(var(--cell-size)/3*2) calc(var(--cell-size)/3*2);
+}
+#game-container.level-10 #board-guides {
+    opacity: 0.09;
 }
 #game-container.level-11 #board {
     /* thin horizontal lines */
     background-color: rgba(25, 46, 23, 1);
     opacity: 1;
-    background-size: 20px 20px;
+    background-size: calc(var(--cell-size)/3*2) calc(var(--cell-size)/3*2);
     background-image:  repeating-linear-gradient(0deg, #1f5731, #1f5731 1px, rgba(25, 46, 23, 1) 1px, rgba(25, 46, 23, 1));
+}
+#game-container.level-12 #board-guides {
+    opacity: 0;
 }
 #game-container.level-12 #board {
     background-color: rgba(23, 39, 46, 1);
     opacity: 1;
-    background-image:  radial-gradient(#1f4457 2px, transparent 2px), radial-gradient(#1f4457 2px, rgba(23, 39, 46, 1) 2px);
-    background-size: 80px 80px;
-    background-position: 0 0,40px 40px;
+    background-image:
+            radial-gradient(#1f4457 var(--gap-size), transparent var(--gap-size)),
+            radial-gradient(#1f4457 var(--gap-size), rgba(23, 39, 46, 1) var(--gap-size));
+    background-size: calc(var(--cell-size)) calc(var(--cell-size));
+    background-position: 0 0, calc(var(--cell-size)/2) calc(var(--cell-size)/2);
+}
+#game-container.level-13 #board-guides {
+    opacity: 0;
 }
 #game-container.level-13 #board {
     background-color: rgba(39, 23, 46, 1);
     opacity: 1;
-    background: linear-gradient(135deg, #401f5755 25%, transparent 25%) -40px 0/ 80px 80px, linear-gradient(225deg, #401f57 25%, transparent 25%) -40px 0/ 80px 80px, linear-gradient(315deg, #401f5755 25%, transparent 25%) 0px 0/ 80px 80px, linear-gradient(45deg, #401f57 25%, rgba(39, 23, 46, 1) 25%) 0px 0/ 80px 80px;
+    background:
+        linear-gradient(135deg, #401f5755 25%, transparent 25%)
+            calc(var(--cell-size)*-1) 0/ calc(var(--cell-size)*2) calc(var(--cell-size)*2),
+        linear-gradient(225deg, #401f57 25%, transparent 25%)
+            calc(var(--cell-size)*-1) 0/ calc(var(--cell-size)*2) calc(var(--cell-size)*2),
+        linear-gradient(315deg, #401f5755 25%, transparent 25%)
+            0px 0/ calc(var(--cell-size)*2) calc(var(--cell-size)*2),
+        linear-gradient(45deg, #401f57 25%, rgba(39, 23, 46, 1) 25%)
+            0px 0/ calc(var(--cell-size)*2) calc(var(--cell-size)*2);
 }
 #game-container.level-14 #board {
    background-color: rgba(46, 23, 23, 1);
