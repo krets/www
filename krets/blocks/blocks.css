@@ -795,8 +795,8 @@ li {
 }
 
 button {
-    width: 10vh;
-    height: 10vh;
+    width: 80%;
+    height: 3em;
     background-color: #333;
     border-radius: 0.25em;
     box-shadow:
@@ -813,8 +813,8 @@ button {
     text-shadow: calc(var(--gap-size)/1) calc(var(--gap-size)/1) var(--gap-size) rgba(0, 0, 0, 0.5);
 }
 button#bottom {
-    width: 6vh;
-    height: 4vh;
+    width: 50%;
+    height: 2em;
 }
 button:before {
     content: '';
