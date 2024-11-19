@@ -1,7 +1,6 @@
 :root {
-    --cell-size: 3.5vh;
-    --gap-size: 0.25vh;
-    --board-hedight: 74.75vh;
+    --cell-size: 2.8vh;
+    --gap-size: calc(var(--cell-size)/14);
     --board-height: calc(20 * (var(--cell-size) + var(--gap-size)) - var(--gap-size));  /* rows(20) * (grid-size + gap) - gap */
     --preview-height: calc(2 * (var(--cell-size) + var(--gap-size)) - var(--gap-size));;
 }
@@ -499,9 +498,9 @@ input:focus {
 }
 
 #controls button {
-    width: 15vw;
-    height: 15vw;
-    margin: 2vw;
+    width: 12vh;
+    height: 10vh;
+    margin: 0 3vh ;
     padding: 0;
     background-color: rgba(0,0,0,0.1);
     border: solid 2px #ccc;
@@ -543,6 +542,7 @@ button#space {
         flex-direction: column;
         flex-wrap: wrap;
         justify-content: space-between;
+        margin-top: 0;
     }
     .info-title,
     .info-value,
@@ -555,12 +555,24 @@ button#space {
         justify-content: normal;
     }
     #level-meter {
-        display: flex;
-        flex-direction: column-reverse;
-        /*display: none;*/
+        /*display: flex;*/
+        position: absolute;
+        bottom:0;
+        /*flex-direction: column-reverse;*/
+        display: block;
+        opacity: .2;
     }
     #preview {
         flex: 3;
+        grid-template-columns: repeat(4, calc(var(--cell-size)/2));
+        grid-template-rows: repeat(2, calc(var(--cell-size)/2));
+        height: calc(var(--preview-height)/2);
+        gap: calc(var(--gap-size)/2);
+        padding: 0;
+    }
+    #preview .cell {
+        height: calc(var(--cell-size)/2);
+        width: calc(var(--cell-size)/2);
     }
     #leader_board {
 

@@ -1,6 +1,10 @@
 /*
 ToDo:
  - Background Generator
+ - mobile layout
+ - hold/swap piece
+ - highlight recently added score on leader board
+ -
  */
 const board_rows = 20;
 const board_cols = 10;
