@@ -536,16 +536,29 @@ button:before {
 @media (max-width: 600px) {
     button {
         width: 25vw;
-        height: 18vw;
+        height: 14vw;
     }
     button#space {
         width: 18vw;
-        height: 12vw;
+        height: 9vw;
     }
     #game-container {
         flex-wrap: wrap;
     }
-
+    .info-meter {
+        padding:0;
+        margin: 0;
+        width: 100%;
+    }
+    .meter-square {
+        width: 5vw;
+        height: .5vh;
+        margin: 0;
+        background-color: #888;
+    }
+    #info {
+        border-radius: .5em;
+    }
     #preview {
         grid-column: 1;
         grid-template-columns: repeat(4, calc(var(--cell-size)/2));
