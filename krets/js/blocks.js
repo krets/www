@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function updateInfo() {
-    document.getElementById("game-container").className = `level-${level}`;
+    document.getElementById("game-container").className = `level-${level%41}`;
     updateLevelMeter();
     document.getElementById("score-value").textContent = score;
     document.getElementById("lines-value").textContent = lines;
@@ -603,12 +603,13 @@ function getTimeout() {
     // Calculate timeout decreasing linearly from max_timeout to min_timeout
     // don't exceed fastest_level.
     const max_timeout = 1000;
-    const min_timeout = 50;
-    const fastest_level = 10;
+    const min_timeout = 25;
+    const fastest_level = 20;
     if (level >= fastest_level) {
         return min_timeout;
     }
-    return max_timeout - ((level - 1) * ((max_timeout-min_timeout) / (fastest_level - 1)));
+    const scale = (max_timeout - min_timeout) / Math.log(fastest_level);
+    return max_timeout - scale * Math.log(level);
 }
 
 function gameLoop() {
