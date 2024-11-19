@@ -130,9 +130,22 @@ background-image: repeating-linear-gradient(
 }
 
 .cell.ghost {
-    background-color: rgba(157, 157, 87, 0.08);
+    background-image:
+        linear-gradient(45deg,
+            rgba(157, 157, 87, 0.15) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(157, 157, 87, 0.15) 75%,
+            rgba(157, 157, 87, 0.15)),
+        linear-gradient(45deg,
+            rgba(157, 157, 87, 0.15) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(157, 157, 87, 0.15) 75%,
+            rgba(157, 157, 87, 0.15));
+    background-size:  calc(var(--gap-size)*2)  calc(var(--gap-size)*2);
+    background-position: 0 0, calc(var(--gap-size)*.5) calc(var(--gap-size)*.5);
 }
-
 .points-1 {
     transform: scale(80%);
     color: #ccc;
