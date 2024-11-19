@@ -133,10 +133,27 @@ background-image: repeating-linear-gradient(
     background-color: rgba(157, 157, 87, 0.08);
 }
 
+.points-1 {
+    transform: scale(80%);
+    color: #ccc;
+}
+.points-2 {
+    color: dodgerblue;
+    transform: scale(2);
+}
+.points-3 {
+    color: forestgreen;
+    transform: scale(3);
+}
+.points-4 {
+    color: #FFCC00;
+    transform: scale(4);
+}
+
 .point {
+    z-index: 99;
     position: absolute;
-    font-size: 19pt;
-    color: #ffffff;
+    font-size: 100%;
     animation: moveUpFadeOut 1.25s cubic-bezier(.1,.94,.82,1.05) forwards;
     bottom: 0;
     left: 0;

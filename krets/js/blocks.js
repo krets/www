@@ -668,13 +668,10 @@ function clearFullRows() {
         score += newPoints;
         level = Math.floor(lines / lines_per_level) + 1;
         updateInfo();
-        animatePoints(newPoints);
+        animatePoints(points, document.getElementById('score-value'), `points-${linesCleared}`);
     }
 }
 function animatePoints(value, target = null, classes = '') {
-    if (target === null) {
-        target = document.getElementById('score-value');
-    }
     const pointElement = document.createElement('div');
     pointElement.className = 'point ' + classes;
     pointElement.textContent = value;
