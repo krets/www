@@ -506,8 +506,13 @@ input:focus {
 }
 
 #score {
-    position: relative;
     grid-column: 3;
+}
+
+#score-value {
+    position: relative;
+    display: inline-block;
+    min-width: 3.6em; /* approx 6 digits */
 }
 
 #preview {

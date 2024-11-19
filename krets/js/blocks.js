@@ -668,7 +668,7 @@ function clearFullRows() {
         score += newPoints;
         level = Math.floor(lines / lines_per_level) + 1;
         updateInfo();
-        animatePoints(points, document.getElementById('score-value'), `points-${linesCleared}`);
+        animatePoints(newPoints, document.getElementById('score-value'), `points-${linesCleared}`);
     }
 }
 function animatePoints(value, target = null, classes = '') {
