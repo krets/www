@@ -134,11 +134,15 @@ background-image: repeating-linear-gradient(
 }
 
 .point {
-  position: absolute;
-  font-size: 19pt;
-  color: #ffffff;
-  animation: moveUpFadeOut 1.25s cubic-bezier(.1,.94,.82,1.05) forwards;
-  left: 0;
+    position: absolute;
+    font-size: 19pt;
+    color: #ffffff;
+    animation: moveUpFadeOut 1.25s cubic-bezier(.1,.94,.82,1.05) forwards;
+    bottom: 0;
+    left: 0;
+}
+#leader_board .point {
+    animation: zoomIn 1.5s cubic-bezier(.1,.94,.82,1.05) forwards;
 }
 
 @keyframes moveUpFadeOut {
@@ -152,7 +156,20 @@ background-image: repeating-linear-gradient(
     opacity: 0;
   }
 }
-
+@keyframes zoomIn {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
 
 @keyframes pulse {
     0% {
@@ -503,6 +520,13 @@ input:focus {
 #leader_board,
 #options {
     grid-column: span 3;
+}
+li {
+    position: relative;
+}
+
+.highlight {
+    color: #fc0;
 }
 
 button {

@@ -433,24 +433,32 @@ function endGame(){
 
 }
 
-function updateLeaderBoard(){
+function updateLeaderBoard() {
     const scores = JSON.parse(localStorage.getItem(leaderBoardKey)) || [];
     const isTopScore = score > Math.max(...scores);
-    if (score > 0){
+    if (score > 0) {
         scores.push(score);
     }
-    scores.sort((a, b) => b - a); // Sort scores in descending order
+    scores.sort((a, b) => a - b); // Sort scores
     localStorage.setItem(leaderBoardKey, JSON.stringify(scores));
     const leaderBoardDiv = document.getElementById('leader_board');
     leaderBoardDiv.innerHTML = '';
 
     const list = document.createElement('ol');
     leaderBoardDiv.appendChild(list);
-    scores.slice(0, 10).forEach(score => {
+
+    const displayedScores = scores.slice(0, 10);
+
+    for (let i = displayedScores.length - 1; i >= 0; i--) {
         const listItem = document.createElement('li');
-        listItem.textContent = score;
+        listItem.textContent = displayedScores[i];
         list.appendChild(listItem);
-    });
+        if (displayedScores[i] === score && (i === 0 || displayedScores[i-1] !== score)) {
+            listItem.classList.add('highlight');
+            animatePoints(score, listItem, 'highlight')
+        }
+    }
+
     return isTopScore;
 }
 
@@ -663,14 +671,17 @@ function clearFullRows() {
         animatePoints(newPoints);
     }
 }
-function animatePoints(value) {
-  const container = document.getElementById('score-value');
-  const pointElement = document.createElement('div');
-  pointElement.className = 'point';
-  pointElement.textContent = value;
+function animatePoints(value, target = null, classes = '') {
+    if (target === null) {
+        target = document.getElementById('score-value');
+    }
+    const pointElement = document.createElement('div');
+    pointElement.className = 'point ' + classes;
+    pointElement.textContent = value;
 
-  container.appendChild(pointElement);
-  pointElement.addEventListener('animationend', () => {
-    container.removeChild(pointElement);
-  });
+    target.appendChild(pointElement);
+    pointElement.addEventListener('animationend', () => {
+        target.removeChild(pointElement);
+    });
+    return pointElement;
 }
