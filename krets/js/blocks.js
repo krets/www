@@ -1,10 +1,12 @@
 /*
 ToDo:
  - Background Generator
- - mobile layout
  - hold/swap piece
  - highlight recently added score on leader board
- -
+ - manifest.json for and app like experience
+   - needs icons and schtuff
+ - Lookup normal speeds per level
+ - Animation to indicate points earned
  */
 const board_rows = 20;
 const board_cols = 10;

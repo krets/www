@@ -489,7 +489,7 @@ input:focus {
 }
 
 #bottom {
-    grid-column: 2;
+    grid-column: 1;
 }
 
 #right {
@@ -524,8 +524,8 @@ button {
     text-shadow: calc(var(--gap-size)/1) calc(var(--gap-size)/1) var(--gap-size) rgba(0, 0, 0, 0.5);
 }
 button#bottom {
-    width: 8vh;
-    height: 6vh;
+    width: 6vh;
+    height: 4vh;
 }
 button:before {
     content: '';
