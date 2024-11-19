@@ -498,9 +498,9 @@ input:focus {
 }
 
 #controls button {
-    width: 12vh;
+    width: 25vw;
     height: 10vh;
-    margin: 0 3vh ;
+    margin: 0 8vw ;
     padding: 0;
     background-color: rgba(0,0,0,0.1);
     border: solid 2px #ccc;
@@ -509,6 +509,10 @@ input:focus {
     cursor: pointer;
     color: white;
     transition: background-color 0.3s, border-color 0.3s;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 button#space {
@@ -575,7 +579,7 @@ button#space {
         width: calc(var(--cell-size)/2);
     }
     #leader_board {
-
+        margin-top: 25vh;
     }
     #score-details {
         display: flex;
