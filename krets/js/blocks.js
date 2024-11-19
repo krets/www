@@ -199,11 +199,14 @@ document.addEventListener("DOMContentLoaded", function() {
         'right': moveRight,
         'down': moveDown
     };
-
+    function preventScroll(event) {
+        event.preventDefault();
+    }
     for (const [id, action] of Object.entries(buttonActions)) {
         const element = document.getElementById(id);
         element.addEventListener('touchstart', action);
         element.addEventListener('touchstart', unpause);
+        element.addEventListener('touchstart', preventScroll);
     }
     if (!document.hasFocus()) {
         pause()
