@@ -784,6 +784,7 @@ input:focus {
 #leader_board,
 #options {
     grid-column: span 3;
+    padding-bottom: 1em;
 }
 li {
     position: relative;
