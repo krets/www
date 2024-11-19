@@ -261,6 +261,7 @@ function initializeGame() {
     level = 1;
     isFirstShape = true;
     game_over = false;
+    selections = {};
     updateInfo()
     spawnNewShape();
 }
