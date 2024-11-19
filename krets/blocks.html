@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Blocks Game</title>
-  <link rel="stylesheet" href="css/blocks.css?q=13">
+  <link rel="stylesheet" href="css/blocks.css?q=14">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&family=Gugi&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -15,39 +15,35 @@
     <div id="board-guides"></div>
     <div id="overlay" style="display: none;"></div>
   </div>
-  <div id="info">
-    <div id="score-details">
-      <div class="info-meter" id="level-meter"></div>
-      <div id="lines" class="info-item">
-        <span class="info-title">Lines:</span>
-        <span class="info-value" id="lines-value"></span>
-      </div>
-      <div id="level" class="info-item">
-        <span class="info-title">Level:</span>
-        <span class="info-value" id="level-value"></span>
-      </div>
-      <div id="score" class="info-item">
-        <span class="info-title">Score:</span>
-        <span class="info-value" id="score-value"></span>
-      </div>
-    </div>
-    <div id="preview"></div>
-    <div id="leader_board"></div>
-    <div id="options">
-      <input type="checkbox" id="ghost_checkbox"/><label for="ghost_checkbox">Ghost Piece</label>
-    </div>
+<div id="info">
+  <div class="info-meter" id="level-meter"></div>
+  <div id="lines" class="info-item">
+    <span class="info-title">Lines:</span>
+    <span class="info-value" id="lines-value"></span>
   </div>
-  <div id="controls" >
-    <button id="up">&uarr;</button>
-    <div>
-      <button id="left">&larr;</button>
-      <button id="space">&nbsp;</button>
-      <button id="right">&rarr;</button>
-    </div>
-    <button id="down">&darr;</button>
+  <div id="level" class="info-item">
+    <span class="info-title">Level:</span>
+    <span class="info-value" id="level-value"></span>
+  </div>
+  <div id="score" class="info-item">
+    <span class="info-title">Score:</span>
+    <span class="info-value" id="score-value"></span>
+  </div>
+  <div id="preview"></div>
+  <button id="up">&uarr;</button>
+  <button id="left">&larr;</button>
+  <button id="space">&nbsp;</button>
+  <button id="right">&rarr;</button>
+  <button id="down">&darr;</button>
+
+  <div id="leader_board"></div>
+  <div id="options">
+    <input type="checkbox" id="ghost_checkbox" />
+    <label for="ghost_checkbox">Ghost Piece</label>
   </div>
 </div>
+</div>
 
-<script src="js/blocks.js?q=13"></script>
+<script src="js/blocks.js?q=14"></script>
 <!--<script src="js/menu.js"></script>-->
 </body>

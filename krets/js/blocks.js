@@ -184,8 +184,11 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('ghost_checkbox').addEventListener('change', function() {
         renderGhostShape();
     });
-    if (('ontouchstart' in window || navigator.maxTouchPoints)) {
-        document.getElementById('controls').style.display = 'flex';
+    if (!('ontouchstart' in window || navigator.maxTouchPoints)) {
+        const buttons = document.querySelectorAll('#info button');
+        buttons.forEach(button => {
+            button.style.display = 'none';
+        });
     }
     const buttonActions = {
         'up': rotate,
