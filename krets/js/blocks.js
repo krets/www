@@ -193,15 +193,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const buttonActions = {
         'up': rotate,
         'left': moveLeft,
-        'space': moveToBottom,
+        'bottom': moveToBottom,
         'right': moveRight,
         'down': moveDown
     };
 
     for (const [id, action] of Object.entries(buttonActions)) {
         const element = document.getElementById(id);
-        element.addEventListener('touchend', action);
-        element.addEventListener('touchend', unpause);
+        element.addEventListener('touchstart', action);
+        element.addEventListener('touchstart', unpause);
     }
     if (!document.hasFocus()) {
         pause()

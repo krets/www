@@ -1,8 +1,12 @@
 :root {
-    --cell-size: 2.8vh;
+    --cell-size: 4.2vh;
     --gap-size: calc(var(--cell-size)/14);
     --board-height: calc(20 * (var(--cell-size) + var(--gap-size)) - var(--gap-size));  /* rows(20) * (grid-size + gap) - gap */
     --preview-height: calc(2 * (var(--cell-size) + var(--gap-size)) - var(--gap-size));;
+    --small-factor: calc(2/3);
+    --cell-size-small: calc(var(--cell-size) * var(--small-factor));
+    --gap-size-small: calc(var(--gap-size) * var(--small-factor));
+    --board-height-small: calc(var(--board-height) * var(--small-factor));
 }
 
 body {
@@ -443,6 +447,7 @@ input:focus {
 
 
 #info {
+    margin-top: 2em;
     display: grid;
     justify-items: center;
     align-items: center;
@@ -467,6 +472,7 @@ input:focus {
 }
 
 #score {
+    position: relative;
     grid-column: 3;
 }
 
@@ -482,7 +488,7 @@ input:focus {
     grid-column: 1;
 }
 
-#space {
+#bottom {
     grid-column: 2;
 }
 
@@ -517,7 +523,7 @@ button {
     color: #d6d6d6;
     text-shadow: calc(var(--gap-size)/1) calc(var(--gap-size)/1) var(--gap-size) rgba(0, 0, 0, 0.5);
 }
-button#space {
+button#bottom {
     width: 8vh;
     height: 6vh;
 }
@@ -534,11 +540,27 @@ button:before {
 }
 
 @media (max-width: 600px) {
+    #board{
+        grid-template-columns: repeat(10, var(--cell-size-small));
+        grid-template-rows: repeat(20, var(--cell-size-small));
+        gap: var(--gap-size-small);
+        border-width: var(--gap-size-small);
+        gap: var(--gap-size-small);
+        height: var(--board-height-small);
+    }
+    #board-container {
+        height: var(--board-height-small);
+    }
+
+    .cell {
+        width: var(--cell-size-small);
+        height: var(--cell-size-small);
+    }
     button {
         width: 25vw;
         height: 14vw;
     }
-    button#space {
+    button#bottom {
         width: 18vw;
         height: 9vw;
     }
@@ -557,7 +579,20 @@ button:before {
         background-color: #888;
     }
     #info {
+        margin-top: 0;
+        position: relative;
         border-radius: .5em;
+    }
+    #board-guides {
+        left: calc(var(--gap-size-small) / 2);
+        background-size:  calc(var(--cell-size-small) + var(--gap-size-small)) var(--cell-size-small);
+        background-image: repeating-linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0) var(--cell-size-small),
+            #000000 var(--gap-size-small),
+            #000000
+        );
     }
     #preview {
         grid-column: 1;
