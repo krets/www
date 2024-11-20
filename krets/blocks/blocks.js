@@ -499,6 +499,9 @@ function pause(message = null) {
     paused = true;
 }
 function unpause(){
+    if(paused === false){
+        return;
+    }
     paused = false;
     overlay.style.display = 'none';
     if(game_over === true){
