@@ -5,7 +5,7 @@ const ASSETS_TO_CACHE = [
   '/blocks/blocks.css',
   '/blocks/favicon.ico',
   '/blocks/blocks-192x192.png',
-  '/blocks/blocks-512x513.png'
+  '/blocks/blocks-512x512.png'
 ];
 
 self.addEventListener('install', event => {
