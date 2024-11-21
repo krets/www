@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.5";
+const version = "v1.0.6";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -212,7 +212,6 @@ document.addEventListener("DOMContentLoaded", function() {
     for (const [id, action] of Object.entries(buttonActions)) {
         const element = document.getElementById(id);
         element.addEventListener('touchstart', action);
-        element.addEventListener('touchstart', unpause);
         element.addEventListener('touchstart', preventScroll);
     }
     if (!document.hasFocus()) {
