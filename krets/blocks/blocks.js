@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.6";
+const version = "v1.0.7";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -274,6 +274,11 @@ function initializeGame() {
             }
         }
     }
+    // re-enable buttons
+    const buttons = document.querySelectorAll('#info button');
+    buttons.forEach(button => {
+        button.disabled = false;
+    });
     lines = 0;
     points = 0;
     level = 1;
@@ -420,7 +425,10 @@ function spawnNewShape() {
 
 function endGame() {
     game_over = true;
-
+    const buttons = document.querySelectorAll('#info button');
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
     const final_screen = document.createElement('div');
     const heading = document.createElement('div');
     const subheading = document.createElement('div');
