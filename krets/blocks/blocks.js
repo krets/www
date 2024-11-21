@@ -43,7 +43,8 @@ const shapes = {
     J: [[-1, 0], [0, 0], [1, 0], [-1, 1]],
     L: [[-1, 0], [0, 0], [1, 0], [1, 1]]
 };
-let selections = {}
+let selections = {};
+let shapeOrder = [];
 
 // Function to get a cell by its coordinates
 function getCellByCoord(cellsObject, x, y) {
@@ -392,10 +393,10 @@ function spawnNewShape() {
         return;
     }
     if (nextShape === null){
-        nextShape = createShape(getRandomShape());
+        nextShape = createShape(getNextShape());
     }
     currentShape = nextShape;
-    nextShape = createShape(getRandomShape());
+    nextShape = createShape(getNextShape());
     drawPreview();
     currentX = Math.floor(board_cols / 2) - 1;
     currentY = 0;
@@ -465,19 +466,21 @@ function updateLeaderBoard() {
     return isTopScore;
 }
 
-function getRandomShape() {
-    const shapeTypes = Object.keys(shapes);
-    const weights = shapeTypes.map(shape => 1 / (selections[shape] || 1));
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let random = Math.random() * totalWeight;
-
-    for (let i = 0; i < shapeTypes.length; i++) {
-        random -= weights[i];
-        if (random <= 0) {
-            selections[shapeTypes[i]] = (selections[shapeTypes[i]] || 0) + 1;
-            return shapeTypes[i];
-        }
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
+}
+
+function getNextShape() {
+    if (shapeOrder.length === 0) {
+        shapeOrder = Object.keys(shapes).concat(Object.keys(shapes));;
+        shuffle(shapeOrder);
+    }
+    const nextShape = shapeOrder.pop();
+    selections[nextShape] = (selections[nextShape] || 0) + 1;
+    return nextShape;
 }
 
 window.addEventListener('blur', function () {
