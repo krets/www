@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.4";
+const version = "v1.0.5";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -278,11 +278,11 @@ function initializeGame() {
     lines = 0;
     points = 0;
     level = 1;
-    isFirstShape = true;
-    game_over = false;
-    selections = {};
     updateInfo()
     spawnNewShape();
+    selections = {};
+    isFirstShape = true;
+    game_over = false;
 }
 
 function moveLeft() {
@@ -369,6 +369,9 @@ function adjustPosition() {
 
 
 function canMoveTo(newX, newY) {
+    if (paused === true){
+        return false
+    }
     return currentShape.coords.every(([dx, dy]) => {
         const x = newX + dx;
         const y = newY + dy;
