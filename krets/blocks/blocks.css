@@ -896,3 +896,12 @@ button:before {
         width: calc(var(--cell-size)/2);
     }
 }
+#version {
+    grid-column: 3;
+    width: 100%;
+    font-size: 75%;
+    padding-right: 4em;
+    padding-bottom: 1em;
+    margin-right: 1em;
+    text-align: right;
+}

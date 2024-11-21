@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.1";
+const version = "v1.0.2";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -177,6 +177,11 @@ function clearShape() {
 document.addEventListener("DOMContentLoaded", function() {
     const board = document.getElementById("board");
     const preview = document.getElementById("preview");
+    const overlay = document.createElement('div');
+    const infodiv = document.getElementById("info");
+    overlay.id = 'version';
+    overlay.textContent = version;
+    infodiv.appendChild(overlay);
 
     createBoard(board, board_rows, board_cols, boardCellsByCoord);
     createBoard(preview, 2, 4, previewCellsByCoord);
