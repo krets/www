@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.3";
+const version = "v1.0.4";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -416,7 +416,7 @@ function spawnNewShape() {
     }
 }
 
-function endGame(){
+function endGame() {
     game_over = true;
 
     const final_screen = document.createElement('div');
@@ -431,18 +431,16 @@ function endGame(){
     subheading.className = 'subtitle';
     bonusheading.className = 'bonustitle';
 
-    heading.innerText = "Game Over!"
+    heading.innerText = "Game Over!";
     subheading.innerText = `Score: ${score}`;
 
     const newTopScore = updateLeaderBoard();
-    if(newTopScore === true){
-        bonusheading.innerText = "New high score!"
+    if (newTopScore === true) {
+        bonusheading.innerText = "New high score!";
     }
 
     pause(final_screen);
-
 }
-
 function updateLeaderBoard() {
     const scores = JSON.parse(localStorage.getItem(leaderBoardKey)) || [];
     const isTopScore = score > Math.max(...scores);
@@ -511,11 +509,11 @@ function unpause(){
     if(paused === false){
         return;
     }
-    paused = false;
-    overlay.style.display = 'none';
     if(game_over === true){
         initializeGame();
     }
+    paused = false;
+    overlay.style.display = 'none';
 }
 
 function togglePause() {
