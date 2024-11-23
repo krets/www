@@ -820,6 +820,7 @@ button {
 button#bottom {
     width: 50%;
     height: 2em;
+    align-self: end;
 }
 button:before {
     content: '';
@@ -858,7 +859,7 @@ button:disabled {
         height: 14vw;
     }
     button#bottom {
-        width: 18vw;
+        width: 12vw;
         height: 9vw;
     }
     #game-container {

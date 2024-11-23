@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.8";
+const version = "v1.0.9";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;

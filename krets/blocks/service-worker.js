@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'blocks-cache';
-const CURRENT_VERSION = 'v1.0.8';
+const CURRENT_VERSION = 'v1.0.9';
 
 const ASSETS_TO_CACHE = [
   `/blocks/blocks.js?v=${CURRENT_VERSION}`,
