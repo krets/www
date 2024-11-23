@@ -695,9 +695,14 @@ input:focus {
 #final_screen .title {
     font-size: 120%;
 }
-#final_screen .bonustitle {
-    font-size: 120%;
+.bonustitle.highscore {
     color: #FC0;
+    font-size: 120%;
+    font-weight: bold;
+}
+.bonustitle.leaderboard {
+    color: #0CF;
+    font-size: 120%;
     font-weight: bold;
 }
 

@@ -30,6 +30,8 @@ def replace_version(old, new):
             with open(temp, 'w') as out:
                 for line in handle.readlines():
                     out.write(line.replace(old, new))
+
+        os.remove(filename)
         os.rename(temp, filename)
 
 def increment_version(version_tuple):

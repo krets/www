@@ -8,7 +8,7 @@ ToDo:
  - Lookup normal speeds per level
  - Animation to indicate points earned
  */
-const version = "v1.0.7";
+const version = "v1.0.8";
 const board_rows = 20;
 const board_cols = 10;
 let level = 1;
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function() {
     createBoard(preview, 2, 4, previewCellsByCoord);
 
     initializeGame();
-    updateLeaderBoard();
+    updateLeaderBoard(0);
     setTimeout(gameLoop, getTimeout());
 
     document.getElementById('ghost_checkbox').addEventListener('change', function() {
@@ -422,9 +422,11 @@ function spawnNewShape() {
         isFirstShape = false;
     }
 }
-
 function endGame() {
+    console.log("Game Over triggered");
     game_over = true;
+    const finalScore = score;
+    score = 0;
     const buttons = document.querySelectorAll('#info button');
     buttons.forEach(button => {
         button.disabled = true;
@@ -442,22 +444,36 @@ function endGame() {
     bonusheading.className = 'bonustitle';
 
     heading.innerText = "Game Over!";
-    subheading.innerText = `Score: ${score}`;
+    subheading.innerText = `Score: ${finalScore}`;
 
-    const newTopScore = updateLeaderBoard();
-    if (newTopScore === true) {
+    console.log("Updating leaderboard with score:", finalScore);
+
+    const leaderboardUpdate = updateLeaderBoard(finalScore);
+    if (leaderboardUpdate.isTopScore) {
+        console.log("New high score achieved!");
         bonusheading.innerText = "New high score!";
+        bonusheading.classList.add('highscore');
+    } else if (leaderboardUpdate.isAddedToLeaderboard) {
+        console.log("Score added to leaderboard.");
+        bonusheading.innerText = "Score added to leaderboard!";
+        bonusheading.classList.add('leaderboard');
+    } else {
+        bonusheading.innerText = "Better luck next time!";
     }
 
     pause(final_screen);
 }
-function updateLeaderBoard() {
+
+function updateLeaderBoard(newScore) {
     const scores = JSON.parse(localStorage.getItem(leaderBoardKey)) || [];
-    const isTopScore = score > Math.max(...scores);
-    if (score > 0) {
-        scores.push(score);
+    const isTopScore = newScore > Math.max(...scores, 0);
+    let isAddedToLeaderboard = false;
+
+    if (newScore > 0) {
+        scores.push(newScore);
+        isAddedToLeaderboard = true;
     }
-    scores.sort((a, b) => a - b); // Sort scores
+    scores.sort((a, b) => b - a); // Sort scores in descending order
     localStorage.setItem(leaderBoardKey, JSON.stringify(scores));
     const leaderBoardDiv = document.getElementById('leader_board');
     leaderBoardDiv.innerHTML = '';
@@ -467,17 +483,20 @@ function updateLeaderBoard() {
 
     const displayedScores = scores.slice(0, 10);
 
-    for (let i = displayedScores.length - 1; i >= 0; i--) {
+    for (let i = 0; i < displayedScores.length; i++) {
         const listItem = document.createElement('li');
         listItem.textContent = displayedScores[i];
         list.appendChild(listItem);
-        if (displayedScores[i] === score && (i === 0 || displayedScores[i-1] !== score)) {
+        if (displayedScores[i] === newScore && (i === 0 || displayedScores[i-1] !== newScore)) {
             listItem.classList.add('highlight');
-            animatePoints(score, listItem, 'highlight')
+            animatePoints(newScore, listItem, 'highlight')
         }
     }
 
-    return isTopScore;
+    return {
+        isTopScore: isTopScore,
+        isAddedToLeaderboard: isAddedToLeaderboard
+    };
 }
 
 function shuffle(array) {
