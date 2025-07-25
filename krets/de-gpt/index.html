@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Character Cleaner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .success {
+            background-color: #28a745;
+        }
+        .success:hover {
+            background-color: #218838;
+        }
+        .stats {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Character Cleaner</h1>
+        <p>Paste your text below to remove non-standard characters and keep only regular keyboard characters.</p>
+
+        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+
+        <div>
+            <button onclick="pasteFromClipboard()">📋 Paste from Clipboard</button>
+            <button onclick="cleanText()">🧹 Clean Text</button>
+            <button onclick="copyToClipboard()" class="success">📄 Copy Cleaned Text</button>
+            <button onclick="clearText()">🗑️ Clear</button>
+        </div>
+
+        <div id="stats" class="stats" style="display: none;"></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        // Define what characters are allowed (regular keyboard characters)
+        // This includes: letters, numbers, common punctuation, and whitespace
+        const allowedCharacters = /^[\x20-\x7E\t\n\r]+$/;
+
+        // Function to check if a character is typeable on a regular keyboard
+        function isAllowedCharacter(char) {
+            return allowedCharacters.test(char);
+        }
+
+        // Clean the text by removing non-standard characters
+        function cleanTextContent(text) {
+            let cleaned = '';
+            let removedCount = 0;
+            let removedChars = new Set();
+
+            for (let char of text) {
+                if (isAllowedCharacter(char)) {
+                    cleaned += char;
+                } else {
+                    removedCount++;
+                    removedChars.add(char);
+                }
+            }
+
+            return {
+                cleaned: cleaned,
+                removedCount: removedCount,
+                removedChars: Array.from(removedChars),
+                originalLength: text.length
+            };
+        }
+
+        // Main clean function
+        function cleanText() {
+            const textarea = document.getElementById('inputText');
+            const statsDiv = document.getElementById('stats');
+            const errorDiv = document.getElementById('error');
+
+            errorDiv.textContent = '';
+
+            if (!textarea.value) {
+                errorDiv.textContent = 'Please paste or type some text first.';
+                return;
+            }
+
+            const result = cleanTextContent(textarea.value);
+            textarea.value = result.cleaned;
+
+            // Show statistics
+            statsDiv.style.display = 'block';
+            if (result.removedCount > 0) {
+                statsDiv.innerHTML = `
+                    <strong>Cleaning complete!</strong><br>
+                    • Original length: ${result.originalLength} characters<br>
+                    • Cleaned length: ${result.cleaned.length} characters<br>
+                    • Removed: ${result.removedCount} non-standard characters<br>
+                    • Examples of removed characters: ${result.removedChars.slice(0, 10).map(c => `"${c}"`).join(', ')}${result.removedChars.length > 10 ? '...' : ''}
+                `;
+            } else {
+                statsDiv.innerHTML = '<strong>Text is already clean!</strong> No non-standard characters found.';
+            }
+        }
+
+        // Paste from clipboard
+        async function pasteFromClipboard() {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '';
+
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('inputText').value = text;
+                // Automatically clean after pasting
+                cleanText();
+            } catch (err) {
+                errorDiv.textContent = 'Unable to access clipboard. Please paste manually using Ctrl+V or Cmd+V.';
+            }
+        }
+
+        // Copy to clipboard
+        async function copyToClipboard() {
+            const textarea = document.getElementById('inputText');
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '';
+
+            if (!textarea.value) {
+                errorDiv.textContent = 'No text to copy.';
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(textarea.value);
+                // Visual feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                // Fallback method
+                textarea.select();
+                document.execCommand('copy');
+                errorDiv.textContent = 'Copied using fallback method.';
+            }
+        }
+
+        // Clear text
+        function clearText() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('error').textContent = '';
+        }
+
+        // Allow Ctrl+V paste to automatically clean
+        document.getElementById('inputText').addEventListener('paste', (e) => {
+            setTimeout(() => {
+                cleanText();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
