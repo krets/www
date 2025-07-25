@@ -10,7 +10,7 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #333;
         }
         .container {
             background: white;
@@ -62,12 +62,23 @@
             color: #dc3545;
             margin-top: 10px;
         }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .conversion-list {
+            font-size: 13px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Text Character Cleaner</h1>
-        <p>Paste your text below to remove non-standard characters and keep only regular keyboard characters.</p>
+        <p>Paste your text below to clean non-standard characters while keeping regular keyboard characters, currency symbols (€, £, $), and European accented characters.</p>
 
         <textarea id="inputText" placeholder="Paste your text here..."></textarea>
 
@@ -80,37 +91,130 @@
 
         <div id="stats" class="stats" style="display: none;"></div>
         <div id="error" class="error"></div>
+
+        <div class="info">
+            <strong>Allowed characters:</strong>
+            <ul style="margin: 5px 0;">
+                <li>Standard keyboard characters (A-Z, a-z, 0-9, punctuation)</li>
+                <li>Currency symbols: $ £ € ¥ ¢</li>
+                <li>Accented characters: àáäâèéëêìíïîòóöôùúüû ñç etc.</li>
+                <li>Special symbols: © ® ™ °</li>
+            </ul>
+            <div class="conversion-list">
+                <strong>Automatic conversions:</strong>
+                <ul style="margin: 5px 0;">
+                    <li>Smart quotes → straight quotes (" ' → " ')</li>
+                    <li>Em/en dashes → hyphen (— – → -)</li>
+                    <li>Bullet points → hyphen with spaces (• → - )</li>
+                    <li>Ellipsis → three periods (… → ...)</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Define what characters are allowed (regular keyboard characters)
-        // This includes: letters, numbers, common punctuation, and whitespace
-        const allowedCharacters = /^[\x20-\x7E\t\n\r]+$/;
+        // Character conversion map
+        const characterConversions = {
+            // Smart quotes to straight quotes
+            0x2018: "'", // ' Left single quote
+            0x2019: "'", // ' Right single quote
+            0x201C: '"', // " Left double quote
+            0x201D: '"', // " Right double quote
+            0x2032: "'", // ′ Prime
+            0x2033: '"', // ″ Double prime
+            0x201E: '"', // „ bottom quotes
 
-        // Function to check if a character is typeable on a regular keyboard
-        function isAllowedCharacter(char) {
-            return allowedCharacters.test(char);
+            // Dashes to hyphen
+            0x2013: "-", // – En dash
+            0x2014: "-", // — Em dash
+
+            // Bullet to hyphen with spaces
+            0x2022: " - ", // • Bullet
+
+            // Ellipsis to three periods
+            0x2026: "...", // … Ellipsis
+        };
+
+        // Additional allowed special characters
+        const specialAllowed = [
+            0x20AC, // € Euro sign
+            0x2122, // ™ Trademark
+            0x00A9, // © Copyright
+            0x00AE, // ® Registered
+            0x00B0, // ° Degree
+        ];
+
+        // Check if character should be kept, converted, or removed
+        function processCharacter(char) {
+            const code = char.charCodeAt(0);
+
+            // Check if it needs conversion
+            if (characterConversions[code]) {
+                return {
+                    action: 'convert',
+                    result: characterConversions[code],
+                    original: char
+                };
+            }
+
+            // Basic ASCII printable characters (space through tilde)
+            if (code >= 0x20 && code <= 0x7E) {
+                return { action: 'keep', result: char };
+            }
+
+            // Tab, newline, carriage return
+            if (code === 0x09 || code === 0x0A || code === 0x0D) {
+                return { action: 'keep', result: char };
+            }
+
+            // Latin-1 Supplement (includes most European accented characters, £, etc.)
+            if (code >= 0x00A0 && code <= 0x00FF) {
+                return { action: 'keep', result: char };
+            }
+
+            // Special allowed characters
+            if (specialAllowed.includes(code)) {
+                return { action: 'keep', result: char };
+            }
+
+            // Remove everything else
+            return { action: 'remove', result: '', original: char };
         }
 
-        // Clean the text by removing non-standard characters
+        // Clean the text by removing non-standard characters and converting special ones
         function cleanTextContent(text) {
             let cleaned = '';
             let removedCount = 0;
-            let removedChars = new Set();
+            let convertedCount = 0;
+            let removedChars = new Map();
+            let convertedChars = new Map();
 
             for (let char of text) {
-                if (isAllowedCharacter(char)) {
-                    cleaned += char;
-                } else {
-                    removedCount++;
-                    removedChars.add(char);
+                const processed = processCharacter(char);
+
+                switch (processed.action) {
+                    case 'keep':
+                        cleaned += processed.result;
+                        break;
+                    case 'convert':
+                        cleaned += processed.result;
+                        convertedCount++;
+                        const convKey = `${processed.original} → ${processed.result}`;
+                        convertedChars.set(convKey, (convertedChars.get(convKey) || 0) + 1);
+                        break;
+                    case 'remove':
+                        removedCount++;
+                        removedChars.set(processed.original, (removedChars.get(processed.original) || 0) + 1);
+                        break;
                 }
             }
 
             return {
                 cleaned: cleaned,
                 removedCount: removedCount,
-                removedChars: Array.from(removedChars),
+                convertedCount: convertedCount,
+                removedChars: removedChars,
+                convertedChars: convertedChars,
                 originalLength: text.length
             };
         }
@@ -133,17 +237,37 @@
 
             // Show statistics
             statsDiv.style.display = 'block';
-            if (result.removedCount > 0) {
-                statsDiv.innerHTML = `
-                    <strong>Cleaning complete!</strong><br>
-                    • Original length: ${result.originalLength} characters<br>
-                    • Cleaned length: ${result.cleaned.length} characters<br>
-                    • Removed: ${result.removedCount} non-standard characters<br>
-                    • Examples of removed characters: ${result.removedChars.slice(0, 10).map(c => `"${c}"`).join(', ')}${result.removedChars.length > 10 ? '...' : ''}
-                `;
-            } else {
-                statsDiv.innerHTML = '<strong>Text is already clean!</strong> No non-standard characters found.';
+
+            let statsHTML = '<strong>Cleaning complete!</strong><br>';
+            statsHTML += `• Original length: ${result.originalLength} characters<br>`;
+            statsHTML += `• Cleaned length: ${result.cleaned.length} characters<br>`;
+
+            if (result.convertedCount > 0) {
+                statsHTML += `• Converted: ${result.convertedCount} special characters<br>`;
+                const convertedList = Array.from(result.convertedChars.entries())
+                    .slice(0, 5)
+                    .map(([conversion, count]) => `${conversion}${count > 1 ? ` ×${count}` : ''}`)
+                    .join(', ');
+                statsHTML += `• Conversions: ${convertedList}${result.convertedChars.size > 5 ? '...' : ''}<br>`;
             }
+
+            if (result.removedCount > 0) {
+                statsHTML += `• Removed: ${result.removedCount} non-standard characters<br>`;
+                const removedList = Array.from(result.removedChars.entries())
+                    .slice(0, 5)
+                    .map(([char, count]) => {
+                        const code = char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
+                        return `"${char}" (U+${code})${count > 1 ? ` ×${count}` : ''}`;
+                    })
+                    .join(', ');
+                statsHTML += `• Removed characters: ${removedList}${result.removedChars.size > 5 ? '...' : ''}`;
+            }
+
+            if (result.removedCount === 0 && result.convertedCount === 0) {
+                statsHTML = '<strong>Text is already clean!</strong> No changes needed.';
+            }
+
+            statsDiv.innerHTML = statsHTML;
         }
 
         // Paste from clipboard
@@ -202,6 +326,13 @@
                 cleanText();
             }, 100);
         });
+
+        // Test function (optional - can be called from console)
+        window.testCharacters = function() {
+            const testString = "Hello €100 £50 — it's \"great\"! • Point one\n• Point two… ™©® 30°C – test";
+            document.getElementById('inputText').value = testString;
+            cleanText();
+        };
     </script>
 </body>
 </html>
