@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen Visualizer</title>
+<style>
+  :root {
+    --bg-body: #ffffff;
+    --text-body: #000000;
+    --bg-panel: #fafafa;
+    --border-panel: #ccc;
+    --bg-input: #ffffff;
+    --text-input: #000000;
+    --bg-vis-container: #eaeaea;
+    --border-vis-container: #aaa;
+    --bg-readonly: #e9ecef;
+    --icon-sun: block;
+    --icon-moon: none;
+  }
+
+  [data-theme="dark"] {
+    --bg-body: #121212;
+    --text-body: #e0e0e0;
+    --bg-panel: #1e1e1e;
+    --border-panel: #333;
+    --bg-input: #2d2d2d;
+    --text-input: #e0e0e0;
+    --bg-vis-container: #181818;
+    --border-vis-container: #444;
+    --bg-readonly: #3a3a3a;
+    --icon-sun: none;
+    --icon-moon: block;
+  }
+
+  body { 
+    font-family: sans-serif; 
+    margin: 20px; 
+    background-color: var(--bg-body); 
+    color: var(--text-body); 
+    transition: background-color 0.3s, color 0.3s; 
+  }
+  .settings-container { display: flex; gap: 20px; margin-bottom: 20px; }
+  .screen-settings { 
+    flex: 1; 
+    padding: 15px; 
+    border: 1px solid var(--border-panel); 
+    border-radius: 5px; 
+    background: var(--bg-panel); 
+  }
+  .screen-settings h3 { margin-top: 0; }
+  label { display: block; margin-top: 10px; font-size: 0.9em; font-weight: bold; }
+  input, select { 
+    width: 100%; 
+    padding: 5px; 
+    margin-top: 5px; 
+    box-sizing: border-box; 
+    background-color: var(--bg-input); 
+    color: var(--text-input); 
+    border: 1px solid var(--border-panel); 
+  }
+  .input-group { display: flex; gap: 10px; }
+  .flex-row { display: flex; gap: 10px; align-items: center; }
+  
+  #visualizer-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background: var(--bg-vis-container);
+    border: 1px solid var(--border-vis-container);
+    overflow: hidden;
+  }
+  
+  .screen-layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+  }
+
+  .screen-content {
+    display: flex;
+    padding: 5px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    border: 2px solid rgba(0,0,0,0.5);
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  #screenA-bg { background-color: rgba(0, 255, 0, 0.6); z-index: 1; }
+  #screenB-bg { background-color: rgba(0, 0, 255, 0.6); z-index: 2; }
+  #overlap-box { background-color: rgba(255, 255, 0, 0.8); z-index: 3; border: 2px dashed #000; }
+  
+  #screenA-content { align-items: flex-start; justify-content: flex-start; }
+  #screenB-content { align-items: flex-start; justify-content: flex-end; }
+
+  /* Density Grid */
+  .density-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    border: 1px solid white;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    margin: 10px;
+    background: #000;
+  }
+  .d-cell { width: 100%; height: 100%; position: relative; }
+  /* Row 1 */
+  .c-black { background: #000000; }
+  .c-gray5 { background: #0d0d0d; }
+  .c-gray18 { background: #777777; }
+  .c-white { background: #ffffff; }
+  /* Row 2 */
+  .c-red { background: #ff0000; }
+  .c-green { background: #00ff00; }
+  .c-blue { background: #0000ff; }
+  .c-white-d65 { background: #ffffff; }
+  /* Row 3 */
+  .c-cyan { background: #00ffff; }
+  .c-magenta { background: #ff00ff; }
+  .c-yellow { background: #ffff00; }
+  .c-skin { background: #ffcd94; }
+  /* Row 4 */
+  .c-teal { background: #008080; }
+  .c-orange { background: #cc5500; }
+  .c-pattern {
+    background-color: white;
+    background-image: 
+      linear-gradient(45deg, #000 25%, transparent 25%), 
+      linear-gradient(-45deg, #000 25%, transparent 25%), 
+      linear-gradient(45deg, transparent 75%, #000 75%), 
+      linear-gradient(-45deg, transparent 75%, #000 75%);
+    background-size: var(--pat-size, 2px) var(--pat-size, 2px);
+    image-rendering: pixelated;
+  }
+  .c-neon-blue { background: #2f27ff; }
+
+  /* Readonly input override */
+  input[readonly] { 
+    background: var(--bg-readonly) !important; 
+    cursor: not-allowed; 
+  }
+
+  /* Theme Toggle Button */
+  #theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-panel);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 100;
+    padding: 0;
+    transition: transform 0.2s, background-color 0.3s;
+  }
+  #theme-toggle:hover {
+    transform: scale(1.1);
+  }
+  #theme-toggle svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-body);
+  }
+</style>
+</head>
+<body>
+
+<div style="max-width: 800px; margin: 0 auto 30px auto; padding: 25px; border: 1px solid var(--border-panel); background: var(--bg-panel); border-radius: 8px; line-height: 1.6; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+  <h2 style="margin-top: 0;">Screen Size Visualizer</h2>
+  <p>This is a quick tool to visualize and compare physical screen sizes against their resolutions. It helps you see how different PPIs and diagonals stack up next to each other in the real world.</p>
+  
+  <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.9; display: inline-flex; align-items: center; gap: 15px; text-align: left; background: var(--bg-body); padding: 10px 15px; border-radius: 5px; border: 1px dashed var(--border-panel);">
+    <div class="density-grid" style="width: 32px; height: 32px; margin: 0; flex-shrink: 0;">
+       <div class="d-cell c-black"></div><div class="d-cell c-gray5"></div><div class="d-cell c-gray18"></div><div class="d-cell c-white"></div>
+       <div class="d-cell c-red"></div><div class="d-cell c-green"></div><div class="d-cell c-blue"></div><div class="d-cell c-white-d65"></div>
+       <div class="d-cell c-cyan"></div><div class="d-cell c-magenta"></div><div class="d-cell c-yellow"></div><div class="d-cell c-skin"></div>
+       <div class="d-cell c-teal"></div><div class="d-cell c-orange"></div><div class="d-cell c-pattern" style="--pat-size: 4px;"></div><div class="d-cell c-neon-blue"></div>
+    </div>
+    <span>
+      The <b>Density Indicator</b> (shown left) represents a physical 64x64 pixel square. 
+      A <b>smaller</b> indicator means higher pixel density (smaller pixels), while a <b>larger</b> indicator reveals a coarser screen with lower PPI.
+    </span>
+  </div>
+</div>
+
+<div class="settings-container">
+  <div class="screen-settings" style="border-top: 4px solid green;">
+    <h3>Screen A</h3>
+    <label>Resolution:</label>
+    <select id="presetA" onchange="applyResolution('A')">
+      <option value="1280,720">HD (1280x720)</option>
+      <option value="1920,1080" selected>FHD (1920x1080)</option>
+      <option value="2560,1440">QHD (2560x1440)</option>
+      <option value="3440,1440">WQHD Ultrawide (3440x1440)</option>
+      <option value="3840,2160">4K UHD (3840x2160)</option>
+      <option value="7680,4320">8K UHD (7680x4320)</option>
+    </select>
+    <div class="input-group">
+      <div><label>Pixels (W):</label><input type="number" id="wPxA" value="1920" oninput="calcSizes('A', 'res')"></div>
+      <div><label>Pixels (H):</label><input type="number" id="hPxA" value="1080" oninput="calcSizes('A', 'res')"></div>
+    </div>
+    <hr>
+    <label>Diagonal (inches):</label>
+    <div class="flex-row">
+      <select id="presetDiagA" onchange="applyDiag('A')" style="flex: 1;">
+        <option value="24" selected>24" (Monitor)</option>
+        <option value="27">27" (Monitor)</option>
+        <option value="32">32" (Monitor/TV)</option>
+        <option value="34">34" (Ultrawide)</option>
+        <option value="42">42" (TV)</option>
+        <option value="55">55" (TV)</option>
+        <option value="65">65" (TV)</option>
+        <option value="75">75" (TV)</option>
+      </select>
+      <input type="number" id="diagA" value="24" step="0.1" oninput="calcSizes('A', 'diag')" style="flex: 1;">
+    </div>
+    <div class="input-group">
+      <div><label>Physical W (in):</label><input type="number" id="physWA" step="0.1" oninput="calcSizes('A', 'w')"></div>
+      <div><label>Physical H (in):</label><input type="number" id="physHA" step="0.1" oninput="calcSizes('A', 'h')"></div>
+      <div><label>PPI:</label><input type="number" id="ppiA" readonly></div>
+    </div>
+  </div>
+
+  <div class="screen-settings" style="border-top: 4px solid blue;">
+    <h3>Screen B</h3>
+    <label>Resolution:</label>
+    <select id="presetB" onchange="applyResolution('B')">
+      <option value="1280,720">HD (1280x720)</option>
+      <option value="1920,1080">FHD (1920x1080)</option>
+      <option value="2560,1440" selected>QHD (2560x1440)</option>
+      <option value="3440,1440">WQHD Ultrawide (3440x1440)</option>
+      <option value="3840,2160">4K UHD (3840x2160)</option>
+      <option value="7680,4320">8K UHD (7680x4320)</option>
+    </select>
+    <div class="input-group">
+      <div><label>Pixels (W):</label><input type="number" id="wPxB" value="2560" oninput="calcSizes('B', 'res')"></div>
+      <div><label>Pixels (H):</label><input type="number" id="hPxB" value="1440" oninput="calcSizes('B', 'res')"></div>
+    </div>
+    <hr>
+    <label>Diagonal (inches):</label>
+    <div class="flex-row">
+      <select id="presetDiagB" onchange="applyDiag('B')" style="flex: 1;">
+        <option value="24">24" (Monitor)</option>
+        <option value="27" selected>27" (Monitor)</option>
+        <option value="32">32" (Monitor/TV)</option>
+        <option value="34">34" (Ultrawide)</option>
+        <option value="42">42" (TV)</option>
+        <option value="55">55" (TV)</option>
+        <option value="65">65" (TV)</option>
+        <option value="75">75" (TV)</option>
+      </select>
+      <input type="number" id="diagB" value="27" step="0.1" oninput="calcSizes('B', 'diag')" style="flex: 1;">
+    </div>
+    <div class="input-group">
+      <div><label>Physical W (in):</label><input type="number" id="physWB" step="0.1" oninput="calcSizes('B', 'w')"></div>
+      <div><label>Physical H (in):</label><input type="number" id="physHB" step="0.1" oninput="calcSizes('B', 'h')"></div>
+      <div><label>PPI:</label><input type="number" id="ppiB" readonly></div>
+    </div>
+  </div>
+</div>
+
+<div id="visualizer-container">
+  <div id="screenA-bg" class="screen-layer"></div>
+  <div id="screenB-bg" class="screen-layer"></div>
+  <div id="overlap-box" class="screen-layer"></div>
+  
+  <div id="screenA-content" class="screen-layer screen-content">
+    <span>A</span>
+    <div id="gridA" class="density-grid">
+       <div class="d-cell c-black"></div><div class="d-cell c-gray5"></div><div class="d-cell c-gray18"></div><div class="d-cell c-white"></div>
+       <div class="d-cell c-red"></div><div class="d-cell c-green"></div><div class="d-cell c-blue"></div><div class="d-cell c-white-d65"></div>
+       <div class="d-cell c-cyan"></div><div class="d-cell c-magenta"></div><div class="d-cell c-yellow"></div><div class="d-cell c-skin"></div>
+       <div class="d-cell c-teal"></div><div class="d-cell c-orange"></div><div class="d-cell c-pattern"></div><div class="d-cell c-neon-blue"></div>
+    </div>
+  </div>
+  <div id="screenB-content" class="screen-layer screen-content">
+    <span>B</span>
+    <div id="gridB" class="density-grid">
+       <div class="d-cell c-black"></div><div class="d-cell c-gray5"></div><div class="d-cell c-gray18"></div><div class="d-cell c-white"></div>
+       <div class="d-cell c-red"></div><div class="d-cell c-green"></div><div class="d-cell c-blue"></div><div class="d-cell c-white-d65"></div>
+       <div class="d-cell c-cyan"></div><div class="d-cell c-magenta"></div><div class="d-cell c-yellow"></div><div class="d-cell c-skin"></div>
+       <div class="d-cell c-teal"></div><div class="d-cell c-orange"></div><div class="d-cell c-pattern"></div><div class="d-cell c-neon-blue"></div>
+    </div>
+  </div>
+</div>
+
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
+  <svg id="icon-sun" viewBox="0 0 24 24" style="display: var(--icon-sun);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.93c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42zm13.31 13.31c-.39.39-.39 1.02 0 1.41l1.42 1.42c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.42-1.42c-.39-.38-1.03-.38-1.41 0zM4.93 19.07c-.39.39-.39 1.02 0 1.41l1.42 1.42c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.42-1.42c-.39-.39-1.02-.39-1.41 0zm15.48-13.31l-1.42-1.42c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.42 1.42c.39.39 1.02.39 1.41 0 .39-.39.39-1.03 0-1.41z"/></svg>
+  <svg id="icon-moon" viewBox="0 0 24 24" style="display: var(--icon-moon);"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+</button>
+
+<script>
+  function applyResolution(screen) {
+    const vals = document.getElementById('preset' + screen).value.split(',');
+    document.getElementById('wPx' + screen).value = vals[0];
+    document.getElementById('hPx' + screen).value = vals[1];
+    calcSizes(screen, 'res');
+  }
+
+  function applyDiag(screen) {
+    document.getElementById('diag' + screen).value = document.getElementById('presetDiag' + screen).value;
+    calcSizes(screen, 'diag');
+  }
+
+  function calcSizes(screen, source) {
+    const wPx = parseFloat(document.getElementById('wPx' + screen).value) || 1;
+    const hPx = parseFloat(document.getElementById('hPx' + screen).value) || 1;
+    const aspect = wPx / hPx;
+
+    let w = parseFloat(document.getElementById('physW' + screen).value) || 0;
+    let h = parseFloat(document.getElementById('physH' + screen).value) || 0;
+    let d = parseFloat(document.getElementById('diag' + screen).value) || 0;
+
+    if (source === 'diag' || source === 'res') {
+      h = d / Math.sqrt(Math.pow(aspect, 2) + 1);
+      w = h * aspect;
+    } else if (source === 'w') {
+      h = w / aspect;
+      d = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
+    } else if (source === 'h') {
+      w = h * aspect;
+      d = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
+    }
+
+    if (source !== 'w') document.getElementById('physW' + screen).value = w.toFixed(2);
+    if (source !== 'h') document.getElementById('physH' + screen).value = h.toFixed(2);
+    if (source !== 'diag' && source !== 'res') document.getElementById('diag' + screen).value = d.toFixed(2);
+
+    const ppi = Math.sqrt(Math.pow(wPx, 2) + Math.pow(hPx, 2)) / d;
+    document.getElementById('ppi' + screen).value = Math.round(ppi);
+
+    drawVisualizer();
+  }
+
+  function drawVisualizer() {
+    const wA = parseFloat(document.getElementById('physWA').value) || 0;
+    const hA = parseFloat(document.getElementById('physHA').value) || 0;
+    const wB = parseFloat(document.getElementById('physWB').value) || 0;
+    const hB = parseFloat(document.getElementById('physHB').value) || 0;
+    const ppiA = parseFloat(document.getElementById('ppiA').value) || 96;
+    const ppiB = parseFloat(document.getElementById('ppiB').value) || 96;
+
+    const container = document.getElementById('visualizer-container');
+    const maxW = Math.max(wA, wB) || 1;
+    const maxH = Math.max(hA, hB) || 1;
+    
+    const scale = Math.min((container.clientWidth * 0.9) / maxW, (container.clientHeight * 0.9) / maxH);
+
+    const setDims = (id, w, h) => {
+      const el = document.getElementById(id);
+      el.style.width = w + 'px';
+      el.style.height = h + 'px';
+    };
+
+    setDims('screenA-bg', wA * scale, hA * scale);
+    setDims('screenA-content', wA * scale, hA * scale);
+    
+    setDims('screenB-bg', wB * scale, hB * scale);
+    setDims('screenB-content', wB * scale, hB * scale);
+
+    setDims('overlap-box', Math.min(wA, wB) * scale, Math.min(hA, hB) * scale);
+    
+    const updateGrid = (id, ppi) => {
+      const gridSize = (64 / ppi) * scale;
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.width = gridSize + 'px';
+        el.style.height = gridSize + 'px';
+        const simPixel = (1 / ppi) * scale;
+        el.style.setProperty('--pat-size', (simPixel * 2) + 'px');
+      }
+    };
+    
+    updateGrid('gridA', ppiA);
+    updateGrid('gridB', ppiB);
+  }
+
+  // Theme Logic
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const target = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', target);
+    localStorage.setItem('theme', target);
+  }
+
+  (function initTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+
+  calcSizes('A', 'diag');
+  calcSizes('B', 'diag');
+</script>
+
+</body>
+</html>
