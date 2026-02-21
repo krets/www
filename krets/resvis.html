@@ -97,46 +97,11 @@
   #screenA-content { align-items: flex-start; justify-content: flex-start; }
   #screenB-content { align-items: flex-start; justify-content: flex-end; }
 
-  /* Density Grid */
-  .density-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    border: 1px solid white;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-    margin: 10px;
-    background: #000;
+  /* Density Visualization */
+  .pixel-word {
+    image-rendering: pixelated; /* Critical for the effect */
+    display: block;
   }
-  .d-cell { width: 100%; height: 100%; position: relative; }
-  /* Row 1 */
-  .c-black { background: #000000; }
-  .c-gray5 { background: #0d0d0d; }
-  .c-gray18 { background: #777777; }
-  .c-white { background: #ffffff; }
-  /* Row 2 */
-  .c-red { background: #ff0000; }
-  .c-green { background: #00ff00; }
-  .c-blue { background: #0000ff; }
-  .c-white-d65 { background: #ffffff; }
-  /* Row 3 */
-  .c-cyan { background: #00ffff; }
-  .c-magenta { background: #ff00ff; }
-  .c-yellow { background: #ffff00; }
-  .c-skin { background: #ffcd94; }
-  /* Row 4 */
-  .c-teal { background: #008080; }
-  .c-orange { background: #cc5500; }
-  .c-pattern {
-    background-color: white;
-    background-image: 
-      linear-gradient(45deg, #000 25%, transparent 25%), 
-      linear-gradient(-45deg, #000 25%, transparent 25%), 
-      linear-gradient(45deg, transparent 75%, #000 75%), 
-      linear-gradient(-45deg, transparent 75%, #000 75%);
-    background-size: var(--pat-size, 2px) var(--pat-size, 2px);
-    image-rendering: pixelated;
-  }
-  .c-neon-blue { background: #2f27ff; }
 
   /* Readonly input override */
   input[readonly] { 
@@ -177,19 +142,15 @@
 
 <div style="max-width: 800px; margin: 0 auto 30px auto; padding: 25px; border: 1px solid var(--border-panel); background: var(--bg-panel); border-radius: 8px; line-height: 1.6; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
   <h2 style="margin-top: 0;">Screen Size Visualizer</h2>
-  <p>This is a quick tool to visualize and compare physical screen sizes against their resolutions. It helps you see how different PPIs and diagonals stack up next to each other in the real world.</p>
+  <p>This tool compares physical screen sizes and their pixel densities. It renders the screen label ("A" or "B") at a fixed physical size (2 inches) on both screens.</p>
   
-  <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.9; display: inline-flex; align-items: center; gap: 15px; text-align: left; background: var(--bg-body); padding: 10px 15px; border-radius: 5px; border: 1px dashed var(--border-panel);">
-    <div class="density-grid" style="width: 32px; height: 32px; margin: 0; flex-shrink: 0;">
-       <div class="d-cell c-black"></div><div class="d-cell c-gray5"></div><div class="d-cell c-gray18"></div><div class="d-cell c-white"></div>
-       <div class="d-cell c-red"></div><div class="d-cell c-green"></div><div class="d-cell c-blue"></div><div class="d-cell c-white-d65"></div>
-       <div class="d-cell c-cyan"></div><div class="d-cell c-magenta"></div><div class="d-cell c-yellow"></div><div class="d-cell c-skin"></div>
-       <div class="d-cell c-teal"></div><div class="d-cell c-orange"></div><div class="d-cell c-pattern" style="--pat-size: 4px;"></div><div class="d-cell c-neon-blue"></div>
-    </div>
-    <span>
-      The <b>Density Indicator</b> (shown left) represents a physical 64x64 pixel square. 
-      A <b>smaller</b> indicator means higher pixel density (smaller pixels), while a <b>larger</b> indicator reveals a coarser screen with lower PPI.
-    </span>
+  <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.9; background: var(--bg-body); padding: 10px 15px; border-radius: 5px; border: 1px dashed var(--border-panel); text-align: left;">
+    <strong>How to read it:</strong>
+    The letters "A" and "B" are rendered with a mosaic filter where <b>1 visual block = 16 physical screen pixels</b>.
+    <ul style="margin: 5px 0 0 20px; padding: 0;">
+      <li><b>Blockier letter</b> = Lower PPI (Larger pixels).</li>
+      <li><b>Smoother letter</b> = Higher PPI (Smaller pixels).</li>
+    </ul>
   </div>
 </div>
 
@@ -274,29 +235,17 @@
   <div id="screenB-bg" class="screen-layer"></div>
   <div id="overlap-box" class="screen-layer"></div>
   
-  <div id="screenA-content" class="screen-layer screen-content">
-    <span>A</span>
-    <div id="gridA" class="density-grid">
-       <div class="d-cell c-black"></div><div class="d-cell c-gray5"></div><div class="d-cell c-gray18"></div><div class="d-cell c-white"></div>
-       <div class="d-cell c-red"></div><div class="d-cell c-green"></div><div class="d-cell c-blue"></div><div class="d-cell c-white-d65"></div>
-       <div class="d-cell c-cyan"></div><div class="d-cell c-magenta"></div><div class="d-cell c-yellow"></div><div class="d-cell c-skin"></div>
-       <div class="d-cell c-teal"></div><div class="d-cell c-orange"></div><div class="d-cell c-pattern"></div><div class="d-cell c-neon-blue"></div>
-    </div>
+  <div id="screenA-content" class="screen-layer screen-content" style="flex-direction: column; align-items: flex-start; justify-content: flex-start;">
+    <img id="imgA" class="pixel-word" alt="Density A">
   </div>
-  <div id="screenB-content" class="screen-layer screen-content">
-    <span>B</span>
-    <div id="gridB" class="density-grid">
-       <div class="d-cell c-black"></div><div class="d-cell c-gray5"></div><div class="d-cell c-gray18"></div><div class="d-cell c-white"></div>
-       <div class="d-cell c-red"></div><div class="d-cell c-green"></div><div class="d-cell c-blue"></div><div class="d-cell c-white-d65"></div>
-       <div class="d-cell c-cyan"></div><div class="d-cell c-magenta"></div><div class="d-cell c-yellow"></div><div class="d-cell c-skin"></div>
-       <div class="d-cell c-teal"></div><div class="d-cell c-orange"></div><div class="d-cell c-pattern"></div><div class="d-cell c-neon-blue"></div>
-    </div>
+  <div id="screenB-content" class="screen-layer screen-content" style="flex-direction: column; align-items: flex-end; justify-content: flex-start;">
+    <img id="imgB" class="pixel-word" alt="Density B">
   </div>
 </div>
 
 <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
   <svg id="icon-sun" viewBox="0 0 24 24" style="display: var(--icon-sun);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.93c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.42 1.42c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.42-1.42zm13.31 13.31c-.39.39-.39 1.02 0 1.41l1.42 1.42c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.42-1.42c-.39-.38-1.03-.38-1.41 0zM4.93 19.07c-.39.39-.39 1.02 0 1.41l1.42 1.42c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.42-1.42c-.39-.39-1.02-.39-1.41 0zm15.48-13.31l-1.42-1.42c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.42 1.42c.39.39 1.02.39 1.41 0 .39-.39.39-1.03 0-1.41z"/></svg>
-  <svg id="icon-moon" viewBox="0 0 24 24" style="display: var(--icon-moon);"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+  <svg id="icon-moon" viewBox="0 0 24 24" style="display: var(--icon-moon);"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5 5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
 </button>
 
 <script>
@@ -370,19 +319,67 @@
 
     setDims('overlap-box', Math.min(wA, wB) * scale, Math.min(hA, hB) * scale);
     
-    const updateGrid = (id, ppi) => {
-      const gridSize = (64 / ppi) * scale;
-      const el = document.getElementById(id);
-      if (el) {
-        el.style.width = gridSize + 'px';
-        el.style.height = gridSize + 'px';
-        const simPixel = (1 / ppi) * scale;
-        el.style.setProperty('--pat-size', (simPixel * 2) + 'px');
-      }
+    // Pixel Word Logic
+    const physWordWidth = 2;   // 2 inches physical size for the letter
+    const blockFactor = 16;    // 1 visual block = 16 screen pixels
+    
+    const updatePixelWord = (imgId, ppi, text) => {
+      const img = document.getElementById(imgId);
+      if (!img) return;
+      
+      const targetPhysWidth = physWordWidth;
+      const fontSize = 100; // Large base size for accurate measurement
+      
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.font = 'bold ' + fontSize + 'px sans-serif';
+      
+      const metrics = tempCtx.measureText(text);
+      const actualW = metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft;
+      const actualH = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+      
+      // Calculate block dimensions
+      // Physical Width * PPI = Total Screen Pixels. / blockFactor = Total Blocks.
+      const totalBlocksW = Math.max(1, Math.floor((targetPhysWidth * ppi) / blockFactor));
+      
+      // Add padding (approx 15% of width, min 1 block)
+      const paddingBlocks = Math.max(1, Math.floor(totalBlocksW * 0.15));
+      
+      // Available width for content
+      const contentBlocksW = Math.max(1, totalBlocksW - (paddingBlocks * 2));
+      
+      // Height based on aspect ratio
+      const contentBlocksH = Math.max(1, Math.round(contentBlocksW * (actualH / actualW)));
+      const totalBlocksH = contentBlocksH + (paddingBlocks * 2);
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = totalBlocksW;
+      canvas.height = totalBlocksH;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#FFFFFF';
+      
+      // Scale font to fit the content area
+      const scaleF = contentBlocksW / actualW;
+      const drawFontSize = fontSize * scaleF;
+      ctx.font = 'bold ' + drawFontSize + 'px sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      
+      // Draw centered in the padded area
+      const x = paddingBlocks + (metrics.actualBoundingBoxLeft * scaleF);
+      const y = paddingBlocks + (metrics.actualBoundingBoxAscent * scaleF);
+      
+      ctx.fillText(text, x, y);
+      
+      img.src = canvas.toDataURL();
+      img.style.width = (targetPhysWidth * scale) + 'px';
+      img.style.height = 'auto'; 
     };
     
-    updateGrid('gridA', ppiA);
-    updateGrid('gridB', ppiB);
+    updatePixelWord('imgA', ppiA, 'A');
+    updatePixelWord('imgB', ppiB, 'B');
   }
 
   // Theme Logic
