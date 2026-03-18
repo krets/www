@@ -39,6 +39,9 @@
     let tick = 0;
     let mouseX = 0;
     let mouseY = 0;
+    let pmouseX = 0;
+    let pmouseY = 0;
+    let isMouseDown = false;
     let amplitude = 20
     let frequency = 90
     let lineCount = 60;
@@ -59,7 +62,13 @@
             let line = [];
             let base_y = start_y + i * step_y;
             for (let j = 0; j < pointCount; j++) {
-                line.push([j*step_x+start_x, base_y + (Math.random() * wobble) - wobble/2 ]);
+                line.push({
+                    x: j*step_x+start_x,
+                    y: base_y + (Math.random() * wobble) - wobble/2, // persistent jittered position from original
+                    base_y: base_y,
+                    vy: 0,     // physics velocity
+                    y_off: 0   // physics offset
+                });
             }
             lines.push(line);
         }
@@ -70,42 +79,66 @@
         context.clearRect(0, 0, canvas.width, canvas.height);
         let start_y = window.innerHeight*windowPad/2;
         let step_y = (window.innerHeight*(1-windowPad))/lineCount;
+        let step_x = (window.innerWidth*(1-windowPad))/pointCount;
 
         for (let i = 0; i < lines.length; i++){
-            let base_y = start_y + i * step_y;
             let line = lines[i];
 
-
             for (let j=0; j < line.length; j++){
-                let point = line[j];
-                // let scale = 1 - Math.abs(window.innerWidth/2 - point[0])/(window.innerWidth*(1-windowPad)/2);
-                let scale = Math.pow(1 - Math.sqrt(Math.abs(mouseX - point[0])/(window.innerWidth*(1-windowPad)/2)), 4);
+                let p = line[j];
                 
-                // let scale = Math.abs(point[0]-(window.innerWidth/2));
-                // scale *= scale;
-                // let scale = 1 - Math.sqrt(Math.abs(window.innerWidth/2 - point[0])/(window.innerWidth*(1-windowPad)/2));
-                // scale = Math.log(Math.abs(window.innerWidth/2 - point[0])/(window.innerWidth*(1-windowPad)/2)) * scale;
-                let max = base_y;
-                // let max = base_y+wobble*scale;
-                let min = base_y-wobble*scale;
-                point[1] -= tickWobble - (tickWobble*Math.random()*2);
+                // 1. Original Spike Envelope Logic
+                let xDistNormalized = Math.min(1, Math.abs(mouseX - p.x) / (window.innerWidth * (1 - windowPad) / 2));
+                let scale = Math.pow(1 - Math.sqrt(xDistNormalized), 4);
+                let max = p.base_y;
+                let min = p.base_y - (wobble * scale);
+                
+                // 2. Original Jitter (Random Walk clamped to envelope)
+                p.y -= tickWobble - (tickWobble * Math.random() * 2);
+                p.y = Math.min(Math.max(p.y, min), max);
 
-                point[1] = Math.min(Math.max(point[1],min),max);
-                line[j] = point;
+                // 3. Physics (Strumming)
+                let render_y = p.y + p.y_off;
+                
+                if (isMouseDown) {
+                    let mouse_dx = Math.abs(mouseX - p.x);
+                    let influence_radius = 120; // Increased radius
+                    
+                    if (mouse_dx < influence_radius) { 
+                        let falloff = Math.pow(1 - (mouse_dx / influence_radius), 2); // Quadratic falloff
+                        let mouseMinY = Math.min(mouseY, pmouseY);
+                        let mouseMaxY = Math.max(mouseY, pmouseY);
+                        
+                        // Vertical crossing check
+                        if (mouseMaxY >= render_y - 10 && mouseMinY <= render_y + 10) {
+                            p.vy += (mouseY - pmouseY) * 0.5 * falloff;
+                        }
+                    }
+                }
+                
+                p.y_off += p.vy;
+                p.vy += -p.y_off * 0.1; // Spring back to offset 0
+                p.vy *= 0.85; // Damping
+                
+                p.last_render_y = render_y; // Store for next frame if needed
+                p.current_render_y = p.y + p.y_off;
             }
+
             context.beginPath();
             context.lineWidth = Math.max((i+1)*lineGrow,1);
-            context.moveTo(line[0][0], line[0][1]);
+            context.moveTo(line[0].x, line[0].current_render_y);
             for (let j=1; j < line.length; j++){
-                let point = line[j];
-                context.lineTo(point[0], point[1]);
+                let p = line[j];
+                context.lineTo(p.x, p.current_render_y);
             }
-            // context.closePath();
+            
             context.fillStyle = "#000000";
-            context.fill()
+            context.fill();
             context.strokeStyle = '#ffffff';
             context.stroke();
         }
+        pmouseX = mouseX;
+        pmouseY = mouseY;
     }
 
     function resizeCanvas() {
@@ -116,10 +149,36 @@
     }
 
 
+    window.addEventListener('mousedown', (e) => {
+        isMouseDown = true;
+        pmouseX = e.clientX;
+        pmouseY = e.clientY;
+    });
+    window.addEventListener('mouseup', () => isMouseDown = false);
+    window.addEventListener('mouseleave', () => isMouseDown = false);
+
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
+
+    // Touch support for strumming
+    window.addEventListener('touchstart', (e) => {
+        isMouseDown = true;
+        let t = e.touches[0];
+        mouseX = t.clientX;
+        mouseY = t.clientY;
+        pmouseX = mouseX;
+        pmouseY = mouseY;
+    });
+    window.addEventListener('touchend', () => isMouseDown = false);
+    window.addEventListener('touchmove', (e) => {
+        let t = e.touches[0];
+        mouseX = t.clientX;
+        mouseY = t.clientY;
+        // prevent scrolling while interacting
+        if (isMouseDown) e.preventDefault();
+    }, { passive: false });
 
     window.addEventListener('resize', resizeCanvas, false);
     setInterval(drawStuff, 20);
