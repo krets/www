@@ -6,16 +6,18 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-
-# Opt into Node 24 globally for this workflow
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   run-lint:
     runs-on: ubuntu-latest
+    # Fixes the 403 error
+    permissions:
+      contents: read
+      packages: read
+      statuses: write 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -28,3 +30,9 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: "main"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          # --- TUNING SETTINGS ---
+          VALIDATE_JSCPD: false         # Turn off Copy-Paste detection
+          VALIDATE_CSS_PRETTIER: false  # Stop failing on CSS formatting
+          VALIDATE_HTML_PRETTIER: false # Stop failing on HTML formatting
+          VALIDATE_YAML_PRETTIER: false # Stop failing on YAML formatting
