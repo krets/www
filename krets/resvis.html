@@ -90,12 +90,12 @@
     pointer-events: none;
   }
 
-  #screenA-bg { background-color: rgba(0, 255, 0, 0.6); z-index: 1; }
-  #screenB-bg { background-color: rgba(0, 0, 255, 0.6); z-index: 2; }
+  #screen-a-bg { background-color: rgba(0, 255, 0, 0.6); z-index: 1; }
+  #screen-b-bg { background-color: rgba(0, 0, 255, 0.6); z-index: 2; }
   #overlap-box { background-color: rgba(255, 255, 0, 0.8); z-index: 3; border: 2px dashed #000; }
   
-  #screenA-content { align-items: flex-start; justify-content: flex-start; }
-  #screenB-content { align-items: flex-start; justify-content: flex-end; }
+  #screen-a-content { align-items: flex-start; justify-content: flex-start; }
+  #screen-b-content { align-items: flex-start; justify-content: flex-end; }
 
   /* Density Visualization */
   .pixel-word {
@@ -158,7 +158,7 @@
   <div class="screen-settings" style="border-top: 4px solid green;">
     <h3>Screen A</h3>
     <label>Resolution:</label>
-    <select id="presetA" onchange="applyResolution('A')">
+    <select id="preset-a" onchange="applyResolution('a')">
       <option value="1280,720">HD (1280x720)</option>
       <option value="1920,1080" selected>FHD (1920x1080)</option>
       <option value="2560,1440">QHD (2560x1440)</option>
@@ -167,13 +167,13 @@
       <option value="7680,4320">8K UHD (7680x4320)</option>
     </select>
     <div class="input-group">
-      <div><label>Pixels (W):</label><input type="number" id="wPxA" value="1920" oninput="calcSizes('A', 'res')"></div>
-      <div><label>Pixels (H):</label><input type="number" id="hPxA" value="1080" oninput="calcSizes('A', 'res')"></div>
+      <div><label>Pixels (W):</label><input type="number" id="w-px-a" value="1920" oninput="calcSizes('a', 'res')"></div>
+      <div><label>Pixels (H):</label><input type="number" id="h-px-a" value="1080" oninput="calcSizes('a', 'res')"></div>
     </div>
     <hr>
     <label>Diagonal (inches):</label>
     <div class="flex-row">
-      <select id="presetDiagA" onchange="applyDiag('A')" style="flex: 1;">
+      <select id="preset-diag-a" onchange="applyDiag('a')" style="flex: 1;">
         <option value="24" selected>24" (Monitor)</option>
         <option value="27">27" (Monitor)</option>
         <option value="32">32" (Monitor/TV)</option>
@@ -183,19 +183,19 @@
         <option value="65">65" (TV)</option>
         <option value="75">75" (TV)</option>
       </select>
-      <input type="number" id="diagA" value="24" step="0.1" oninput="calcSizes('A', 'diag')" style="flex: 1;">
+      <input type="number" id="diag-a" value="24" step="0.1" oninput="calcSizes('a', 'diag')" style="flex: 1;">
     </div>
     <div class="input-group">
-      <div><label>Physical W (in):</label><input type="number" id="physWA" step="0.1" oninput="calcSizes('A', 'w')"></div>
-      <div><label>Physical H (in):</label><input type="number" id="physHA" step="0.1" oninput="calcSizes('A', 'h')"></div>
-      <div><label>PPI:</label><input type="number" id="ppiA" readonly></div>
+      <div><label>Physical W (in):</label><input type="number" id="phys-w-a" step="0.1" oninput="calcSizes('a', 'w')"></div>
+      <div><label>Physical H (in):</label><input type="number" id="phys-h-a" step="0.1" oninput="calcSizes('a', 'h')"></div>
+      <div><label>PPI:</label><input type="number" id="ppi-a" readonly></div>
     </div>
   </div>
 
   <div class="screen-settings" style="border-top: 4px solid blue;">
     <h3>Screen B</h3>
     <label>Resolution:</label>
-    <select id="presetB" onchange="applyResolution('B')">
+    <select id="preset-b" onchange="applyResolution('b')">
       <option value="1280,720">HD (1280x720)</option>
       <option value="1920,1080">FHD (1920x1080)</option>
       <option value="2560,1440" selected>QHD (2560x1440)</option>
@@ -204,13 +204,13 @@
       <option value="7680,4320">8K UHD (7680x4320)</option>
     </select>
     <div class="input-group">
-      <div><label>Pixels (W):</label><input type="number" id="wPxB" value="2560" oninput="calcSizes('B', 'res')"></div>
-      <div><label>Pixels (H):</label><input type="number" id="hPxB" value="1440" oninput="calcSizes('B', 'res')"></div>
+      <div><label>Pixels (W):</label><input type="number" id="w-px-b" value="2560" oninput="calcSizes('b', 'res')"></div>
+      <div><label>Pixels (H):</label><input type="number" id="h-px-b" value="1440" oninput="calcSizes('b', 'res')"></div>
     </div>
     <hr>
     <label>Diagonal (inches):</label>
     <div class="flex-row">
-      <select id="presetDiagB" onchange="applyDiag('B')" style="flex: 1;">
+      <select id="preset-diag-b" onchange="applyDiag('b')" style="flex: 1;">
         <option value="24">24" (Monitor)</option>
         <option value="27" selected>27" (Monitor)</option>
         <option value="32">32" (Monitor/TV)</option>
@@ -220,28 +220,28 @@
         <option value="65">65" (TV)</option>
         <option value="75">75" (TV)</option>
       </select>
-      <input type="number" id="diagB" value="27" step="0.1" oninput="calcSizes('B', 'diag')" style="flex: 1;">
+      <input type="number" id="diag-b" value="27" step="0.1" oninput="calcSizes('b', 'diag')" style="flex: 1;">
     </div>
     <div class="input-group">
-      <div><label>Physical W (in):</label><input type="number" id="physWB" step="0.1" oninput="calcSizes('B', 'w')"></div>
-      <div><label>Physical H (in):</label><input type="number" id="physHB" step="0.1" oninput="calcSizes('B', 'h')"></div>
-      <div><label>PPI:</label><input type="number" id="ppiB" readonly></div>
+      <div><label>Physical W (in):</label><input type="number" id="phys-w-b" step="0.1" oninput="calcSizes('b', 'w')"></div>
+      <div><label>Physical H (in):</label><input type="number" id="phys-h-b" step="0.1" oninput="calcSizes('b', 'h')"></div>
+      <div><label>PPI:</label><input type="number" id="ppi-b" readonly></div>
     </div>
   </div>
 </div>
 
 <div id="visualizer-container">
-  <div id="screenA-bg" class="screen-layer"></div>
-  <div id="screenB-bg" class="screen-layer"></div>
+  <div id="screen-a-bg" class="screen-layer"></div>
+  <div id="screen-b-bg" class="screen-layer"></div>
   <div id="overlap-box" class="screen-layer"></div>
   
-  <div id="screenA-content" class="screen-layer screen-content" style="flex-direction: column; align-items: flex-start; justify-content: flex-start;">
-    <img id="imgA" class="pixel-word" alt="Density A">
-    <div id="ppi-labelA" style="font-size: 1.2rem; margin-top: 4px;"></div>
+  <div id="screen-a-content" class="screen-layer screen-content" style="flex-direction: column; align-items: flex-start; justify-content: flex-start;">
+    <img id="img-a" class="pixel-word" alt="Density A">
+    <div id="ppi-label-a" style="font-size: 1.2rem; margin-top: 4px;"></div>
   </div>
-  <div id="screenB-content" class="screen-layer screen-content" style="flex-direction: column; align-items: flex-end; justify-content: flex-start;">
-    <img id="imgB" class="pixel-word" alt="Density B">
-    <div id="ppi-labelB" style="font-size: 1.2rem; margin-top: 4px;"></div>
+  <div id="screen-b-content" class="screen-layer screen-content" style="flex-direction: column; align-items: flex-end; justify-content: flex-start;">
+    <img id="img-b" class="pixel-word" alt="Density B">
+    <div id="ppi-label-b" style="font-size: 1.2rem; margin-top: 4px;"></div>
   </div>
 </div>
 
@@ -252,25 +252,25 @@
 
 <script>
   function applyResolution(screen) {
-    const vals = document.getElementById('preset' + screen).value.split(',');
-    document.getElementById('wPx' + screen).value = vals[0];
-    document.getElementById('hPx' + screen).value = vals[1];
+    const vals = document.getElementById('preset-' + screen).value.split(',');
+    document.getElementById('w-px-' + screen).value = vals[0];
+    document.getElementById('h-px-' + screen).value = vals[1];
     calcSizes(screen, 'res');
   }
 
   function applyDiag(screen) {
-    document.getElementById('diag' + screen).value = document.getElementById('presetDiag' + screen).value;
+    document.getElementById('diag-' + screen).value = document.getElementById('preset-diag-' + screen).value;
     calcSizes(screen, 'diag');
   }
 
   function calcSizes(screen, source) {
-    const wPx = parseFloat(document.getElementById('wPx' + screen).value) || 1;
-    const hPx = parseFloat(document.getElementById('hPx' + screen).value) || 1;
+    const wPx = parseFloat(document.getElementById('w-px-' + screen).value) || 1;
+    const hPx = parseFloat(document.getElementById('h-px-' + screen).value) || 1;
     const aspect = wPx / hPx;
 
-    let w = parseFloat(document.getElementById('physW' + screen).value) || 0;
-    let h = parseFloat(document.getElementById('physH' + screen).value) || 0;
-    let d = parseFloat(document.getElementById('diag' + screen).value) || 0;
+    let w = parseFloat(document.getElementById('phys-w-' + screen).value) || 0;
+    let h = parseFloat(document.getElementById('phys-h-' + screen).value) || 0;
+    let d = parseFloat(document.getElementById('diag-' + screen).value) || 0;
 
     if (source === 'diag' || source === 'res') {
       h = d / Math.sqrt(Math.pow(aspect, 2) + 1);
@@ -283,23 +283,23 @@
       d = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
     }
 
-    if (source !== 'w') document.getElementById('physW' + screen).value = w.toFixed(2);
-    if (source !== 'h') document.getElementById('physH' + screen).value = h.toFixed(2);
-    if (source !== 'diag' && source !== 'res') document.getElementById('diag' + screen).value = d.toFixed(2);
+    if (source !== 'w') document.getElementById('phys-w-' + screen).value = w.toFixed(2);
+    if (source !== 'h') document.getElementById('phys-h-' + screen).value = h.toFixed(2);
+    if (source !== 'diag' && source !== 'res') document.getElementById('diag-' + screen).value = d.toFixed(2);
 
     const ppi = Math.sqrt(Math.pow(wPx, 2) + Math.pow(hPx, 2)) / d;
-    document.getElementById('ppi' + screen).value = Math.round(ppi);
+    document.getElementById('ppi-' + screen).value = Math.round(ppi);
 
     drawVisualizer();
   }
 
   function drawVisualizer() {
-    const wA = parseFloat(document.getElementById('physWA').value) || 0;
-    const hA = parseFloat(document.getElementById('physHA').value) || 0;
-    const wB = parseFloat(document.getElementById('physWB').value) || 0;
-    const hB = parseFloat(document.getElementById('physHB').value) || 0;
-    const ppiA = parseFloat(document.getElementById('ppiA').value) || 96;
-    const ppiB = parseFloat(document.getElementById('ppiB').value) || 96;
+    const wA = parseFloat(document.getElementById('phys-w-a').value) || 0;
+    const hA = parseFloat(document.getElementById('phys-h-a').value) || 0;
+    const wB = parseFloat(document.getElementById('phys-w-b').value) || 0;
+    const hB = parseFloat(document.getElementById('phys-h-b').value) || 0;
+    const ppiA = parseFloat(document.getElementById('ppi-a').value) || 96;
+    const ppiB = parseFloat(document.getElementById('ppi-b').value) || 96;
 
     const container = document.getElementById('visualizer-container');
     const maxW = Math.max(wA, wB) || 1;
@@ -313,16 +313,16 @@
       el.style.height = h + 'px';
     };
 
-    setDims('screenA-bg', wA * scale, hA * scale);
-    setDims('screenA-content', wA * scale, hA * scale);
+    setDims('screen-a-bg', wA * scale, hA * scale);
+    setDims('screen-a-content', wA * scale, hA * scale);
     
-    setDims('screenB-bg', wB * scale, hB * scale);
-    setDims('screenB-content', wB * scale, hB * scale);
+    setDims('screen-b-bg', wB * scale, hB * scale);
+    setDims('screen-b-content', wB * scale, hB * scale);
 
     setDims('overlap-box', Math.min(wA, wB) * scale, Math.min(hA, hB) * scale);
     
-    document.getElementById('ppi-labelA').textContent = Math.round(ppiA) + ' PPI';
-    document.getElementById('ppi-labelB').textContent = Math.round(ppiB) + ' PPI';
+    document.getElementById('ppi-label-a').textContent = Math.round(ppiA) + ' PPI';
+    document.getElementById('ppi-label-b').textContent = Math.round(ppiB) + ' PPI';
     
     // Pixel Word Logic
     const physWordWidth = 2;   // 2 inches physical size for the letter
@@ -383,8 +383,8 @@
       img.style.height = 'auto'; 
     };
     
-    updatePixelWord('imgA', ppiA, 'A');
-    updatePixelWord('imgB', ppiB, 'B');
+    updatePixelWord('img-a', ppiA, 'A');
+    updatePixelWord('img-b', ppiB, 'B');
   }
 
   // Theme Logic
@@ -404,8 +404,8 @@
     }
   })();
 
-  calcSizes('A', 'diag');
-  calcSizes('B', 'diag');
+  calcSizes('a', 'diag');
+  calcSizes('b', 'diag');
 </script>
 
 </body>

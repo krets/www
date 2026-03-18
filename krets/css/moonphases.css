@@ -40,6 +40,10 @@ body {
   border-width: 4px;
 }
 
+.moon-day.highlight .moon {
+  border-color: #fc0;
+}
+
 #today > .moon {
   margin: 1em auto;
 }
@@ -61,6 +65,11 @@ body {
   font-size: 3em;
 }
 
+.nav-btn:hover {
+  opacity: 1 !important;
+  color: #fc0;
+}
+
 .nav-btn {
   font-size: 2em;
   cursor: pointer;
@@ -72,11 +81,6 @@ body {
 
 .year-nav:hover .nav-btn {
   opacity: 0.7;
-}
-
-.nav-btn:hover {
-  opacity: 1 !important;
-  color: #fc0;
 }
 
 .nav-btn.reset {
@@ -95,10 +99,6 @@ body {
 
 .clear {
   clear: both;
-}
-
-.moon-day.highlight .moon {
-  border-color: #fc0;
 }
 
 .moon-day {
