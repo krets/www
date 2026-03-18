@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Moon Phases</title>
     <link rel="stylesheet" href="css/moonphases.css">
 </head>
 <body>
@@ -231,7 +232,7 @@ name.innerText = phase_name(moonAge);
 
 let currentDate = document.createElement('span');
 document.getElementById('today').appendChild(currentDate);
-currentDate.classList.add('current_date');
+currentDate.classList.add('current-date');
 currentDate.innerText = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
 function displayNextPhase(phaseName, daysUntil) {
@@ -241,13 +242,13 @@ function displayNextPhase(phaseName, daysUntil) {
 
     let title = document.createElement('span');
     container.appendChild(title);
-    title.classList.add('title_next')
+    title.classList.add('title-next')
     let daysStr = daysUntil === 0 ? "today" : `in ${daysUntil} day${daysUntil === 1 ? '' : 's'}`;
     title.innerText = `Next ${phaseName} (${daysStr})`;
 
     let dateInfo = document.createElement('span');
     container.appendChild(dateInfo);
-    dateInfo.classList.add('next_date');
+    dateInfo.classList.add('next-date');
 
     let targetDate = new Date();
     targetDate.setDate(today.getDate() + daysUntil);
@@ -287,3 +288,4 @@ generateMoonCalendar(new Date().getFullYear());
 </script>
 <script src="js/menu.js"></script>
 </body>
+</html>
