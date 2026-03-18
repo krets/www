@@ -42,6 +42,7 @@
     let pmouseX = 0;
     let pmouseY = 0;
     let isMouseDown = false;
+    let activeTouches = []; // Track multiple touch points
     let amplitude = 20
     let frequency = 90
     let lineCount = 60;
@@ -100,22 +101,31 @@
                 // 3. Physics (Strumming)
                 let render_y = p.y + p.y_off;
                 
+                // Collect all active interaction points
+                let interactors = [];
                 if (isMouseDown) {
-                    let mouse_dx = Math.abs(mouseX - p.x);
+                    interactors.push({ x: mouseX, y: mouseY, px: pmouseX, py: pmouseY });
+                }
+                activeTouches.forEach(t => {
+                    interactors.push({ x: t.x, y: t.y, px: t.px, py: t.py });
+                });
+
+                interactors.forEach(interactor => {
+                    let dx = Math.abs(interactor.x - p.x);
                     let influence_radius = 120;
                     
-                    if (mouse_dx < influence_radius) { 
-                        let falloff = Math.pow(1 - (mouse_dx / influence_radius), 2);
-                        let mouseMinY = Math.min(mouseY, pmouseY);
-                        let mouseMaxY = Math.max(mouseY, pmouseY);
+                    if (dx < influence_radius) { 
+                        let falloff = Math.pow(1 - (dx / influence_radius), 2);
+                        let iMinY = Math.min(interactor.y, interactor.py);
+                        let iMaxY = Math.max(interactor.y, interactor.py);
                         
                         // Vertical crossing check
-                        if (mouseMaxY >= render_y - 20 && mouseMinY <= render_y + 20) {
-                            let force = (mouseY - pmouseY) * 0.5 * falloff;
-                            p.vy += Math.max(Math.min(force, 50), -50); // Clamp force
+                        if (iMaxY >= render_y - 20 && iMinY <= render_y + 20) {
+                            let force = (interactor.y - interactor.py) * 0.5 * falloff;
+                            p.vy += Math.max(Math.min(force, 50), -50);
                         }
                     }
-                }
+                });
                 
                 p.y_off += p.vy;
                 p.vy += -p.y_off * 0.1; // Spring back
@@ -178,21 +188,42 @@
     });
 
     // Touch support for strumming
+    function handleTouches(e) {
+        let newTouches = [];
+        for (let i = 0; i < e.touches.length; i++) {
+            let t = e.touches[i];
+            let pt = activeTouches.find(at => at.id === t.identifier);
+            newTouches.push({
+                id: t.identifier,
+                x: t.clientX,
+                y: t.clientY,
+                px: pt ? pt.x : t.clientX,
+                py: pt ? pt.y : t.clientY
+            });
+        }
+        activeTouches = newTouches;
+        if (e.touches.length > 0) {
+            // Use the first touch for the "peak" behavior
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        }
+    }
+
     window.addEventListener('touchstart', (e) => {
-        isMouseDown = true;
-        let t = e.touches[0];
-        mouseX = t.clientX;
-        mouseY = t.clientY;
-        pmouseX = mouseX;
-        pmouseY = mouseY;
+        handleTouches(e);
     });
-    window.addEventListener('touchend', () => isMouseDown = false);
+    window.addEventListener('touchend', (e) => {
+        handleTouches(e);
+        if (e.touches.length === 0) activeTouches = [];
+    });
+    window.addEventListener('touchcancel', (e) => {
+        handleTouches(e);
+        if (e.touches.length === 0) activeTouches = [];
+    });
     window.addEventListener('touchmove', (e) => {
-        let t = e.touches[0];
-        mouseX = t.clientX;
-        mouseY = t.clientY;
+        handleTouches(e);
         // prevent scrolling while interacting
-        if (isMouseDown) e.preventDefault();
+        if (e.touches.length > 0) e.preventDefault();
     }, { passive: false });
 
     window.addEventListener('resize', resizeCanvas, false);
