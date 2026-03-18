@@ -34,6 +34,37 @@ body {
 #calendar {
     display: inline-block;
 }
+.year-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 100px; /* Space for hidden buttons */
+}
+.year-nav h1 {
+    margin: 0 20px;
+    font-size: 3em;
+}
+.nav-btn {
+    font-size: 2em;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    user-select: none;
+    padding: 10px;
+}
+.year-nav:hover .nav-btn {
+    opacity: 0.7;
+}
+.nav-btn:hover {
+    opacity: 1 !important;
+    color: #fc0;
+}
+.nav-btn.reset {
+    position: absolute;
+    right: 0;
+    font-size: 1.5em;
+}
 #calendar h1 {
     text-align: center;
 }
@@ -70,7 +101,24 @@ body {
     opacity: 1;
 }
 span.phase {
-    margin-bottom: 1em;
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 0.2em;
+}
+.current_date {
+    font-size: 1.2em;
+    margin-bottom: 1.5em;
+    color: #999;
+}
+.title_next {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.2em;
+}
+.next_date {
+    display: block;
+    font-size: 0.9em;
+    color: #999;
 }
 table {
     margin: auto;

@@ -12,44 +12,24 @@
 let left, right, cover;
 // const LUNAR_CYCLE = 29.5305888531;
 const LUNAR_CYCLE = 29.53058770576;
+const LUNAR_REFERENCE_JD = 2451550.26; // New Moon Jan 6, 2000 18:14 UTC
 const today = new Date();
-// reference date should be a known new moon
-const reference_date = Date.UTC(2021, 11, 31, 18, 33)
-
 
 const getJulianDate = (date = new Date()) => {
-  const time = date.getTime();
-  const tzoffset = date.getTimezoneOffset()
-
-  return (time / 86400000) - (tzoffset / 1440) + 2440587.5;
+  return (date.getTime() / 86400000) + 2440587.5;
 }
 
-const getLunarAge = (date = new Date()) => {
-  const julianDate = getJulianDate(date);
-  const referenceJulianDate = getJulianDate(new Date(reference_date));
-  const daysSinceNewMoon = julianDate - referenceJulianDate;
-  return daysSinceNewMoon % LUNAR_CYCLE;
-};
 const getLunarAgePercent = (date = new Date()) => {
-  return normalize((getJulianDate(date) - 2451550.1) / LUNAR_CYCLE);
+  return normalize((getJulianDate(date) - LUNAR_REFERENCE_JD) / LUNAR_CYCLE);
 }
+
 const normalize = value => {
   value = value - Math.floor(value);
   if (value < 0)
     value = value + 1
   return value;
 }
-function getPhaseOld(date) {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  const day = date.getUTCDate();
-  const utcDate = Date.UTC(year, month - 1, day) / 86400000 -
-                  reference_date / 86400000;
-  const lunationNumber = Math.floor(utcDate / LUNAR_CYCLE);
-  // Calculate the moon's age in days
-  const phase = (utcDate - lunationNumber * LUNAR_CYCLE) / LUNAR_CYCLE;
-  return [moonAge, phase];
-}
+
 function getPhase(date) {
     const phase = getLunarAgePercent(date)
     const moonAge = phase * LUNAR_CYCLE;
@@ -114,7 +94,8 @@ const LUNAR_PHASES = {
     0: "New Moon",
     0.25: "First Quarter",
     0.5: "Full Moon",
-    0.75: "Last Quarter"
+    0.75: "Last Quarter",
+    1: "New Moon"
 };
 
 function is_in_phase(moonAge, multiplier) {
@@ -137,12 +118,41 @@ function phase_name(moonAge){
 
 function generateMoonCalendar(year) {
   const calendarElement = document.getElementById('calendar');
+  calendarElement.innerHTML = ''; // Clear existing calendar
+
+  const yearContainer = document.createElement('div');
+  yearContainer.className = 'year-nav';
+  
+  const prevBtn = document.createElement('span');
+  prevBtn.innerHTML = '&#9664;'; // ◀
+  prevBtn.className = 'nav-btn prev';
+  prevBtn.title = 'Previous Year';
+  prevBtn.onclick = () => generateMoonCalendar(year - 1);
 
   const yearHeader = document.createElement('h1');
   yearHeader.innerText = year;
-  calendarElement.appendChild(yearHeader);
+  
+  const nextBtn = document.createElement('span');
+  nextBtn.innerHTML = '&#9654;'; // ▶
+  nextBtn.className = 'nav-btn next';
+  nextBtn.title = 'Next Year';
+  nextBtn.onclick = () => generateMoonCalendar(year + 1);
 
-  let past = "past"
+  const currentYear = new Date().getFullYear();
+  const resetBtn = document.createElement('span');
+  resetBtn.innerHTML = '&#8634;'; // ↺
+  resetBtn.className = 'nav-btn reset';
+  resetBtn.title = 'Reset to Current Year';
+  resetBtn.onclick = () => generateMoonCalendar(currentYear);
+  if (year === currentYear) {
+      resetBtn.style.visibility = 'hidden';
+  }
+
+  yearContainer.appendChild(prevBtn);
+  yearContainer.appendChild(yearHeader);
+  yearContainer.appendChild(nextBtn);
+  yearContainer.appendChild(resetBtn);
+  calendarElement.appendChild(yearContainer);
 
   for (let month = 1; month <= 12; month++) {
     const monthWrap = document.createElement('div');
@@ -159,7 +169,6 @@ function generateMoonCalendar(year) {
     let date = null;
     for (let day = 1; day <= daysInMonth; day++) {
       date = new Date(year, month - 1, day, 12, 0 , 0);
-      // date.setUTCHours(12, 0, 0, 0);
       const dayDiv = document.createElement('div');
       dayDiv.classList.add('moon-day');
       [moonAge, phase] = getPhase(date);
@@ -168,11 +177,17 @@ function generateMoonCalendar(year) {
           dayDiv.classList.add('highlight');
       }
 
+      let dayStatus = "upcoming";
+      const compareDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+      if (date < compareDate) {
+          dayStatus = "past";
+      }
+
       if(date.getDate() === today.getDate() && date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth()){
           dayDiv.classList.add('today');
-          past = "upcoming"
       }
-      dayDiv.classList.add(past);
+      
+      dayDiv.classList.add(dayStatus);
       dayDiv.appendChild(moon_shape(phase, 48));
       const dateString = `${monthText} ${date.getDate()}`;
 
@@ -206,9 +221,7 @@ function formatDateUTC(date) {
     let minutes = date.getUTCMinutes().toString().padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
-// const [moonAge, phase] = getPhase(today);
-const moonAge = getLunarAge(today);
-const phase = getLunarAgePercent(today);
+const [moonAge, phase] = getPhase(today);
 document.getElementById('today').appendChild(moon_shape(phase, 200))
 
 let name = document.createElement('span');
@@ -216,13 +229,41 @@ document.getElementById('today').appendChild(name);
 name.classList.add('phase')
 name.innerText = phase_name(moonAge);
 
-let title = document.createElement('span');
-document.getElementById('today').appendChild(title);
-title.classList.add('title_next')
-title.innerText = "Next Full Moon";
+let currentDate = document.createElement('span');
+document.getElementById('today').appendChild(currentDate);
+currentDate.classList.add('current_date');
+currentDate.innerText = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-let nextFullMoon = document.createElement('span');
-document.getElementById('today').appendChild(nextFullMoon);
+function displayNextPhase(phaseName, daysUntil) {
+    let container = document.createElement('div');
+    document.getElementById('today').appendChild(container);
+    container.style.marginBottom = "1.5em";
+
+    let title = document.createElement('span');
+    container.appendChild(title);
+    title.classList.add('title_next')
+    let daysStr = daysUntil === 0 ? "today" : `in ${daysUntil} day${daysUntil === 1 ? '' : 's'}`;
+    title.innerText = `Next ${phaseName} (${daysStr})`;
+
+    let dateInfo = document.createElement('span');
+    container.appendChild(dateInfo);
+    dateInfo.classList.add('next_date');
+
+    let targetDate = new Date();
+    targetDate.setDate(today.getDate() + daysUntil);
+
+    // Format: "Monday, March 30, 2026, 7:08 PM (UTC+1)"
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+    const localStr = targetDate.toLocaleString(undefined, options);
+    
+    const offsetMinutes = -targetDate.getTimezoneOffset();
+    const hours = Math.floor(Math.abs(offsetMinutes) / 60);
+    const mins = Math.abs(offsetMinutes) % 60;
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const offsetStr = `UTC${sign}${hours}${mins > 0 ? ':' + mins.toString().padStart(2, '0') : ''}`;
+    
+    dateInfo.innerText = `${localStr} (${offsetStr})`;
+}
 
 let daysUntilNextFullMoon;
 if (moonAge < LUNAR_CYCLE * 0.5) {
@@ -231,31 +272,18 @@ if (moonAge < LUNAR_CYCLE * 0.5) {
     daysUntilNextFullMoon = Math.round(LUNAR_CYCLE - moonAge + LUNAR_CYCLE * 0.5);
 }
 
-let nextFullMoonDate = new Date();
-nextFullMoonDate.setDate(today.getDate() + daysUntilNextFullMoon);
+let daysUntilNextNewMoon = Math.round(LUNAR_CYCLE - moonAge);
 
-let table = document.createElement('table');
-let row1 = table.insertRow();
-let cell1 = row1.insertCell();
-cell1.textContent = `UTC`;
+let phases = [
+    { name: "Full Moon", days: daysUntilNextFullMoon },
+    { name: "New Moon", days: daysUntilNextNewMoon }
+];
+phases.sort((a, b) => a.days - b.days);
 
-let cell2 = row1.insertCell();
-cell2.textContent = formatDateUTC(nextFullMoonDate);
-
-let row2 = table.insertRow();
-let cell3 = row2.insertCell();
-let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-cell3.textContent = `Local time (${timeZone})`;
-
-let cell4 = row2.insertCell();
-cell4.textContent = nextFullMoonDate.toLocaleString();
-// cell4.textContent = formatDate(nextFullMoonDate);
-
-nextFullMoon.appendChild(table);
+phases.forEach(p => displayNextPhase(p.name, p.days));
 
 generateMoonCalendar(new Date().getFullYear());
 
 </script>
-<script src="/js/menu.js"></script>
+<script src="js/menu.js"></script>
 </body>
