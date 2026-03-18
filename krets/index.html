@@ -102,38 +102,53 @@
                 
                 if (isMouseDown) {
                     let mouse_dx = Math.abs(mouseX - p.x);
-                    let influence_radius = 120; // Increased radius
+                    let influence_radius = 120;
                     
                     if (mouse_dx < influence_radius) { 
-                        let falloff = Math.pow(1 - (mouse_dx / influence_radius), 2); // Quadratic falloff
+                        let falloff = Math.pow(1 - (mouse_dx / influence_radius), 2);
                         let mouseMinY = Math.min(mouseY, pmouseY);
                         let mouseMaxY = Math.max(mouseY, pmouseY);
                         
                         // Vertical crossing check
-                        if (mouseMaxY >= render_y - 10 && mouseMinY <= render_y + 10) {
-                            p.vy += (mouseY - pmouseY) * 0.5 * falloff;
+                        if (mouseMaxY >= render_y - 20 && mouseMinY <= render_y + 20) {
+                            let force = (mouseY - pmouseY) * 0.5 * falloff;
+                            p.vy += Math.max(Math.min(force, 50), -50); // Clamp force
                         }
                     }
                 }
                 
                 p.y_off += p.vy;
-                p.vy += -p.y_off * 0.1; // Spring back to offset 0
+                p.vy += -p.y_off * 0.1; // Spring back
                 p.vy *= 0.85; // Damping
                 
-                p.last_render_y = render_y; // Store for next frame if needed
+                // Clamp offset to prevent the line from flying away or hiding too much
+                p.y_off = Math.max(Math.min(p.y_off, 200), -200);
+                
                 p.current_render_y = p.y + p.y_off;
             }
 
+            // Draw the "Curtain" fill to properly layer lines
             context.beginPath();
-            context.lineWidth = Math.max((i+1)*lineGrow,1);
-            context.moveTo(line[0].x, line[0].current_render_y);
-            for (let j=1; j < line.length; j++){
-                let p = line[j];
-                context.lineTo(p.x, p.current_render_y);
+            // Start from bottom-left
+            context.moveTo(line[0].x, canvas.height);
+            // Trace the wavy line
+            for (let j=0; j < line.length; j++){
+                context.lineTo(line[j].x, line[j].current_render_y);
             }
+            // End at bottom-right
+            context.lineTo(line[line.length-1].x, canvas.height);
+            context.closePath();
             
             context.fillStyle = "#000000";
             context.fill();
+
+            // Draw the actual white line
+            context.beginPath();
+            context.lineWidth = Math.max((i+1)*lineGrow, 1);
+            context.moveTo(line[0].x, line[0].current_render_y);
+            for (let j=1; j < line.length; j++){
+                context.lineTo(line[j].x, line[j].current_render_y);
+            }
             context.strokeStyle = '#ffffff';
             context.stroke();
         }
