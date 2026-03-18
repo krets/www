@@ -1,39 +1,45 @@
 :root {
-    --cell-size: 4.2vh;
-    --gap-size: calc(var(--cell-size)/14);
-    --board-height: calc(20 * (var(--cell-size) + var(--gap-size)) - var(--gap-size));  /* rows(20) * (grid-size + gap) - gap */
-    --preview-height: calc(2 * (var(--cell-size) + var(--gap-size)) - var(--gap-size));;
-    --small-factor: calc(2/3);
-    --cell-size-small: calc(var(--cell-size) * var(--small-factor));
-    --gap-size-small: calc(var(--gap-size) * var(--small-factor));
-    --board-height-small: calc(var(--board-height) * var(--small-factor));
+  --cell-size: 4.2vh;
+  --gap-size: calc(var(--cell-size)/14);
+  --board-height: calc(
+    20 * (var(--cell-size) + var(--gap-size)) - var(--gap-size)
+  ); /* rows(20) * (grid-size + gap) - gap */
+  --preview-height: calc(
+    2 * (var(--cell-size) + var(--gap-size)) - var(--gap-size)
+  );
+  --small-factor: calc(2/3);
+  --cell-size-small: calc(var(--cell-size) * var(--small-factor));
+  --gap-size-small: calc(var(--gap-size) * var(--small-factor));
+  --board-height-small: calc(var(--board-height) * var(--small-factor));
 }
 
 body {
-    margin:0;
-    padding: var(--cell-size);
-    background-color: #222;
-    color: white;
-    font-family: "Geo", sans-serif;
+  margin: 0;
+  padding: var(--cell-size);
+  background-color: #222;
+  color: white;
+  font-family: "Geo", sans-serif;
 }
 #wrap {
-    /*padding: 2em;*/
+  /*padding: 2em;*/
 }
 #board {
-    cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAOklEQVR4nO3OMQ4AIAgEwT3+/+ezUUPraek2hIIJAOaimjNGCsB2jKwPYmQDkpQg1ZeGnOXo6vd72AAcuxT+o8BYJwAAAABJRU5ErkJggg=='), crosshair;
-    display: grid;
-    grid-template-columns: repeat(10, var(--cell-size));
-    grid-template-rows: repeat(20, var(--cell-size));
-    gap: var(--gap-size);
-    background-color: #333;
-    padding: 0;
-    border: var(--gap-size) solid #111;
-    height: var(--board-height);
+  cursor:
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAOklEQVR4nO3OMQ4AIAgEwT3+/+ezUUPraek2hIIJAOaimjNGCsB2jKwPYmQDkpQg1ZeGnOXo6vd72AAcuxT+o8BYJwAAAABJRU5ErkJggg=="),
+    crosshair;
+  display: grid;
+  grid-template-columns: repeat(10, var(--cell-size));
+  grid-template-rows: repeat(20, var(--cell-size));
+  gap: var(--gap-size);
+  background-color: #333;
+  padding: 0;
+  border: var(--gap-size) solid #111;
+  height: var(--board-height);
 }
 
 .cell {
-    width: var(--cell-size);
-    height: var(--cell-size);
+  width: var(--cell-size);
+  height: var(--cell-size);
 }
 #board-container {
   position: relative;
@@ -47,23 +53,22 @@ body {
   gap: var(--gap-size);
   padding: 0.5em;
   height: var(--preview-height);
-
 }
 #board-guides {
-    position: absolute;
-    opacity: 0.2;
-    top: 0;
-    left: calc(var(--gap-size) / 2);
-    width: 101%;
-    height: 100%;
-    background-size:  calc(var(--cell-size) + var(--gap-size)) var(--cell-size);
-background-image: repeating-linear-gradient(
+  position: absolute;
+  opacity: 0.2;
+  top: 0;
+  left: calc(var(--gap-size) / 2);
+  width: 101%;
+  height: 100%;
+  background-size: calc(var(--cell-size) + var(--gap-size)) var(--cell-size);
+  background-image: repeating-linear-gradient(
     to right,
     rgba(255, 255, 255, 0) 0,
     rgba(255, 255, 255, 0) var(--cell-size),
     #000000 var(--gap-size),
     #000000
-);
+  );
 }
 
 #game-container {
@@ -98,81 +103,87 @@ background-image: repeating-linear-gradient(
 .shape-S,
 .shape-T,
 .shape-Z {
-    z-index: 10;
+  z-index: 10;
 }
 
 .shape-T {
-    background-color: #c0279a !important;
+  background-color: #c0279a !important;
 }
 
 .shape-I {
-    background-color: #bd4333 !important;
+  background-color: #bd4333 !important;
 }
 
 .shape-O {
-    background-color: #bdbb27 !important;
+  background-color: #bdbb27 !important;
 }
 
 .shape-Z {
-    background-color: #41ad2c !important;
+  background-color: #41ad2c !important;
 }
 
 .shape-L {
-    background-color: #29b08a !important;
+  background-color: #29b08a !important;
 }
 
 .shape-J {
-    background-color: #2b73bd !important;
+  background-color: #2b73bd !important;
 }
 
 .shape-S {
-    background-color: #6933bd !important;
+  background-color: #6933bd !important;
 }
 
 .cell.ghost {
-    background-image:
-        linear-gradient(45deg,
-            rgba(157, 157, 87, 0.15) 25%,
-            transparent 25%,
-            transparent 75%,
-            rgba(157, 157, 87, 0.15) 75%,
-            rgba(157, 157, 87, 0.15)),
-        linear-gradient(45deg,
-            rgba(157, 157, 87, 0.15) 25%,
-            transparent 25%,
-            transparent 75%,
-            rgba(157, 157, 87, 0.15) 75%,
-            rgba(157, 157, 87, 0.15));
-    background-size:  calc(var(--gap-size)*2)  calc(var(--gap-size)*2);
-    background-position: 0 0, calc(var(--gap-size)*.5) calc(var(--gap-size)*.5);
+  background-image:
+    linear-gradient(
+      45deg,
+      rgba(157, 157, 87, 0.15) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(157, 157, 87, 0.15) 75%,
+      rgba(157, 157, 87, 0.15)
+    ),
+    linear-gradient(
+      45deg,
+      rgba(157, 157, 87, 0.15) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(157, 157, 87, 0.15) 75%,
+      rgba(157, 157, 87, 0.15)
+    );
+  background-size: calc(var(--gap-size) * 2) calc(var(--gap-size) * 2);
+  background-position:
+    0 0,
+    calc(var(--gap-size) * 0.5) calc(var(--gap-size) * 0.5);
 }
 .points-1 {
-    transform: scale(80%);
-    color: #ccc;
+  transform: scale(80%);
+  color: #ccc;
 }
 .points-2 {
-    color: dodgerblue;
-    transform: scale(2);
+  color: dodgerblue;
+  transform: scale(2);
 }
 .points-3 {
-    color: forestgreen;
-    transform: scale(3);
+  color: forestgreen;
+  transform: scale(3);
 }
 .points-4 {
-    color: #FFCC00;
-    transform: scale(4);
+  color: #ffcc00;
+  transform: scale(4);
 }
 
 .point {
-    z-index: 99;
-    position: absolute;
-    font-size: 100%;
-    animation: moveUpFadeOut 1.25s cubic-bezier(.1,.94,.82,1.05) forwards;
-    bottom: 0;
-    left: 0;
+  z-index: 99;
+  position: absolute;
+  font-size: 100%;
+  animation: moveUpFadeOut 1.25s cubic-bezier(0.1, 0.94, 0.82, 1.05) forwards;
+  bottom: 0;
+  left: 0;
 }
 #leader_board .point {
-    animation: zoomIn 1.5s cubic-bezier(.1,.94,.82,1.05) forwards;
+  animation: zoomIn 1.5s cubic-bezier(0.1, 0.94, 0.82, 1.05) forwards;
 }
 
 @keyframes moveUpFadeOut {
@@ -202,410 +213,827 @@ background-image: repeating-linear-gradient(
 }
 
 @keyframes pulse {
-    0% {
-        filter: brightness(1);
-    }
-    50% {
-        filter: brightness(1.2);
-    }
-    100% {
-        filter: brightness(1);
-    }
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+  100% {
+    filter: brightness(1);
+  }
 }
 
 .locked {
-    animation: pulse 0.25s ease-in-out;
+  animation: pulse 0.25s ease-in-out;
 }
 
 #game-container.level-2 #board {
-    /* solid */
-    background-color: #1a2c41;
-    background-image: none;
+  /* solid */
+  background-color: #1a2c41;
+  background-image: none;
 }
 #game-container.level-3 #board {
-    /* Cutting matt */
-    background-color: rgba(25, 47, 38, 1);
-    opacity: 1;
-    background-image:
-            linear-gradient(#233b36 calc(var(--cell-size)/10), transparent calc(var(--cell-size)/10)),
-            linear-gradient(90deg, #233b36 calc(var(--cell-size)/10), transparent calc(var(--cell-size)/10)),
-            linear-gradient(#233b36 calc(var(--cell-size)/20), transparent calc(var(--cell-size)/20)),
-            linear-gradient(90deg, #233b36 calc(var(--cell-size)/20), rgba(25, 47, 38, 1) calc(var(--cell-size)/20));
-    background-size:
-            calc(var(--cell-size)*2) calc(var(--cell-size)*2),
-            calc(var(--cell-size)*2) calc(var(--cell-size)*2),
-            calc(var(--cell-size)/2) calc(var(--cell-size)/2),
-            calc(var(--cell-size)/2) calc(var(--cell-size)/2);
-    background-position:
-            calc(var(--cell-size)/-10) calc(var(--cell-size)/-10),
-            calc(var(--cell-size)/-10) calc(var(--cell-size)/-10),
-            calc(var(--cell-size)/-20) calc(var(--cell-size)/-20),
-            calc(var(--cell-size)/-20) calc(var(--cell-size)/-20);
+  /* Cutting matt */
+  background-color: rgba(25, 47, 38, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      #233b36 calc(var(--cell-size) / 10),
+      transparent calc(var(--cell-size) / 10)
+    ),
+    linear-gradient(
+      90deg,
+      #233b36 calc(var(--cell-size) / 10),
+      transparent calc(var(--cell-size) / 10)
+    ),
+    linear-gradient(
+      #233b36 calc(var(--cell-size) / 20),
+      transparent calc(var(--cell-size) / 20)
+    ),
+    linear-gradient(
+      90deg,
+      #233b36 calc(var(--cell-size) / 20),
+      rgba(25, 47, 38, 1) calc(var(--cell-size) / 20)
+    );
+  background-size:
+    calc(var(--cell-size) * 2) calc(var(--cell-size) * 2),
+    calc(var(--cell-size) * 2) calc(var(--cell-size) * 2),
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2),
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  background-position:
+    calc(var(--cell-size) / -10) calc(var(--cell-size) / -10),
+    calc(var(--cell-size) / -10) calc(var(--cell-size) / -10),
+    calc(var(--cell-size) / -20) calc(var(--cell-size) / -20),
+    calc(var(--cell-size) / -20) calc(var(--cell-size) / -20);
 }
 #game-container.level-4 #board {
-    /* Diag TL -> BR */
-    opacity: 1;
-    background: repeating-linear-gradient(
-        45deg,
-        #39440e,
-        #39440e calc(var(--cell-size)/10),
-        #2a3014 calc(var(--cell-size)/10),
-        #2a3014 calc(var(--cell-size)/2)
-    );
-    background-size: auto;
+  /* Diag TL -> BR */
+  opacity: 1;
+  background: repeating-linear-gradient(
+    45deg,
+    #39440e,
+    #39440e calc(var(--cell-size) / 10),
+    #2a3014 calc(var(--cell-size) / 10),
+    #2a3014 calc(var(--cell-size) / 2)
+  );
+  background-size: auto;
 }
 #game-container.level-5 #board {
-    /* triangles */
-    background-color: rgba(23, 46, 45, 1);
-    opacity: 1;
-    background-image: linear-gradient(45deg, #1f5748 50%, rgba(23, 46, 45, 1) 50%);
-    background-size:
-        calc((var(--cell-size) + var(--gap-size))/2)
-        calc((var(--cell-size) + var(--gap-size))/2);
+  /* triangles */
+  background-color: rgba(23, 46, 45, 1);
+  opacity: 1;
+  background-image: linear-gradient(
+    45deg,
+    #1f5748 50%,
+    rgba(23, 46, 45, 1) 50%
+  );
+  background-size: calc((var(--cell-size) + var(--gap-size)) / 2)
+    calc((var(--cell-size) + var(--gap-size)) / 2);
 }
 #game-container.level-6 #board {
-    /* concentric circles from top left */
-    background-color: #30142d;
-    opacity: 1;
-    background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #30142d calc(var(--cell-size)/3) ), repeating-linear-gradient( #442b4655, #442b46 );
-    background-size: auto;
+  /* concentric circles from top left */
+  background-color: #30142d;
+  opacity: 1;
+  background-image:
+    repeating-radial-gradient(
+      circle at 0 0,
+      transparent 0,
+      #30142d calc(var(--cell-size) / 3)
+    ),
+    repeating-linear-gradient(#442b4655, #442b46);
+  background-size: auto;
 }
 #game-container.level-7 #board {
-    /* diamonds gingham */
-    background-color: rgba(46, 43, 23, 1);
-    opacity: 1;
-    background-image:  linear-gradient(135deg, #343a17 25%, transparent 25%), linear-gradient(225deg, #343a17 25%, transparent 25%), linear-gradient(45deg, #343a17 25%, transparent 25%), linear-gradient(315deg, #343a17 25%, rgba(46, 43, 23, 1) 25%);
-    background-position:  var(--cell-size) 0, var(--cell-size) 0, 0 0, 0 0;
-    background-size: var(--cell-size) var(--cell-size);
-    background-repeat: repeat;
+  /* diamonds gingham */
+  background-color: rgba(46, 43, 23, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(135deg, #343a17 25%, transparent 25%),
+    linear-gradient(225deg, #343a17 25%, transparent 25%),
+    linear-gradient(45deg, #343a17 25%, transparent 25%),
+    linear-gradient(315deg, #343a17 25%, rgba(46, 43, 23, 1) 25%);
+  background-position:
+    var(--cell-size) 0,
+    var(--cell-size) 0,
+    0 0,
+    0 0;
+  background-size: var(--cell-size) var(--cell-size);
+  background-repeat: repeat;
 }
 #game-container.level-8 #board {
-    /* zig-zag */
-    background-color: rgba(23, 46, 40, 1);
-    opacity: 1;
-    background-image:
-            linear-gradient(135deg, #173b36 25%, transparent 25%),
-            linear-gradient(225deg, #173b36 25%, transparent 25%),
-            linear-gradient(45deg, #173b36 25%, transparent 25%),
-            linear-gradient(315deg, #173b36 25%,
-            rgba(23, 46, 40, 1) 25%);
-    background-position:
-            calc(var(--cell-size)/2) 0,
-            calc(var(--cell-size)/2) 0,
-            0 0,
-            0 0;
-    background-size: var(--cell-size) var(--cell-size);
-    background-repeat: repeat;
+  /* zig-zag */
+  background-color: rgba(23, 46, 40, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(135deg, #173b36 25%, transparent 25%),
+    linear-gradient(225deg, #173b36 25%, transparent 25%),
+    linear-gradient(45deg, #173b36 25%, transparent 25%),
+    linear-gradient(315deg, #173b36 25%, rgba(23, 46, 40, 1) 25%);
+  background-position:
+    calc(var(--cell-size) / 2) 0,
+    calc(var(--cell-size) / 2) 0,
+    0 0,
+    0 0;
+  background-size: var(--cell-size) var(--cell-size);
+  background-repeat: repeat;
 }
 #game-container.level-9 #board {
-    /* 3d cubes */
-    background-color: rgba(32, 23, 46, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(30deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
-        linear-gradient(150deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
-        linear-gradient(30deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
-        linear-gradient(150deg, #311f57 12%, transparent 12.5%, transparent 87%, #311f57 87.5%, #311f57),
-        linear-gradient(60deg, #311f5777 25%, transparent 25.5%, transparent 75%, #311f5777 75%, #311f5777),
-        linear-gradient(60deg, #311f5777 25%, transparent 25.5%, transparent 75%, #311f5777 75%, #311f5777);
-    background-size: var(--cell-size) calc(1.75 * var(--cell-size));
-    background-position:
-        0 0,
-        0 0,
-        calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.875),
-        calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.875),
-        0 0,
-        calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.875);
+  /* 3d cubes */
+  background-color: rgba(32, 23, 46, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      30deg,
+      #311f57 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #311f57 87.5%,
+      #311f57
+    ),
+    linear-gradient(
+      150deg,
+      #311f57 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #311f57 87.5%,
+      #311f57
+    ),
+    linear-gradient(
+      30deg,
+      #311f57 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #311f57 87.5%,
+      #311f57
+    ),
+    linear-gradient(
+      150deg,
+      #311f57 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #311f57 87.5%,
+      #311f57
+    ),
+    linear-gradient(
+      60deg,
+      #311f5777 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #311f5777 75%,
+      #311f5777
+    ),
+    linear-gradient(
+      60deg,
+      #311f5777 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #311f5777 75%,
+      #311f5777
+    );
+  background-size: var(--cell-size) calc(1.75 * var(--cell-size));
+  background-position:
+    0 0,
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.875),
+    calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.875),
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.875);
 }
 #game-container.level-10 #board {
-    /* checker */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image: repeating-linear-gradient(45deg, #571f1f 25%, transparent 25%, transparent 75%, #571f1f 75%, #571f1f), repeating-linear-gradient(45deg, #571f1f 25%, rgba(46, 23, 23, 1) 25%, rgba(46, 23, 23, 1) 75%, #571f1f 75%, #571f1f);
-    background-position: 0 0, calc(var(--cell-size) / 3) calc(var(--cell-size) / 3);
-    background-size: calc(var(--cell-size) / 3 * 2) calc(var(--cell-size) / 3 * 2);
+  /* checker */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      #571f1f 25%,
+      transparent 25%,
+      transparent 75%,
+      #571f1f 75%,
+      #571f1f
+    ),
+    repeating-linear-gradient(
+      45deg,
+      #571f1f 25%,
+      rgba(46, 23, 23, 1) 25%,
+      rgba(46, 23, 23, 1) 75%,
+      #571f1f 75%,
+      #571f1f
+    );
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 3) calc(var(--cell-size) / 3);
+  background-size: calc(var(--cell-size) / 3 * 2) calc(var(--cell-size) / 3 * 2);
 }
 #game-container.level-11 #board {
-    /* thin horizontal lines */
-    background-color: rgba(25, 46, 23, 1);
-    opacity: 1;
-    background-size: calc(var(--cell-size) / 3 * 2) calc(var(--cell-size) / 3 * 2);
-    background-image: repeating-linear-gradient(0deg, #1f5731, #1f5731 var(--gap-size), rgba(25, 46, 23, 1) var(--gap-size), rgba(25, 46, 23, 1));
+  /* thin horizontal lines */
+  background-color: rgba(25, 46, 23, 1);
+  opacity: 1;
+  background-size: calc(var(--cell-size) / 3 * 2) calc(var(--cell-size) / 3 * 2);
+  background-image: repeating-linear-gradient(
+    0deg,
+    #1f5731,
+    #1f5731 var(--gap-size),
+    rgba(25, 46, 23, 1) var(--gap-size),
+    rgba(25, 46, 23, 1)
+  );
 }
 #game-container.level-12 #board {
-    /* Dotted grid */
-    background-color: rgba(23, 39, 46, 1);
-    opacity: 1;
-    background-image:
-        radial-gradient(#1f4457 var(--gap-size), transparent var(--gap-size)),
-        radial-gradient(#1f4457 var(--gap-size), rgba(23, 39, 46, 1) var(--gap-size));
-    background-size: var(--cell-size) var(--cell-size);
-    background-position: 0 0, calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  /* Dotted grid */
+  background-color: rgba(23, 39, 46, 1);
+  opacity: 1;
+  background-image:
+    radial-gradient(#1f4457 var(--gap-size), transparent var(--gap-size)),
+    radial-gradient(
+      #1f4457 var(--gap-size),
+      rgba(23, 39, 46, 1) var(--gap-size)
+    );
+  background-size: var(--cell-size) var(--cell-size);
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
 }
 #game-container.level-13 #board {
-    /* triangles */
-    background-color: rgba(39, 23, 46, 1);
-    opacity: 1;
-    background:
-        linear-gradient(135deg, #401f5755 25%, transparent 25%)
-            calc(var(--cell-size) * -1) 0 / calc(var(--cell-size) * 2) calc(var(--cell-size) * 2),
-        linear-gradient(225deg, #401f57 25%, transparent 25%)
-            calc(var(--cell-size) * -1) 0 / calc(var(--cell-size) * 2) calc(var(--cell-size) * 2),
-        linear-gradient(315deg, #401f5755 25%, transparent 25%)
-            0 0 / calc(var(--cell-size) * 2) calc(var(--cell-size) * 2),
-        linear-gradient(45deg, #401f57 25%, rgba(39, 23, 46, 1) 25%)
-            0 0 / calc(var(--cell-size) * 2) calc(var(--cell-size) * 2);
+  /* triangles */
+  background-color: rgba(39, 23, 46, 1);
+  opacity: 1;
+  background:
+    linear-gradient(135deg, #401f5755 25%, transparent 25%)
+      calc(var(--cell-size) * -1) 0 / calc(var(--cell-size) * 2)
+      calc(var(--cell-size) * 2),
+    linear-gradient(225deg, #401f57 25%, transparent 25%)
+      calc(var(--cell-size) * -1) 0 / calc(var(--cell-size) * 2)
+      calc(var(--cell-size) * 2),
+    linear-gradient(315deg, #401f5755 25%, transparent 25%) 0 0 /
+      calc(var(--cell-size) * 2) calc(var(--cell-size) * 2),
+    linear-gradient(45deg, #401f57 25%, rgba(39, 23, 46, 1) 25%) 0 0 /
+      calc(var(--cell-size) * 2) calc(var(--cell-size) * 2);
 }
 #game-container.level-14 #board {
-    /* circles pattern */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image: radial-gradient(ellipse farthest-corner at var(--cell-size) var(--cell-size), #571f1f, #571f1f 50%, rgba(46, 23, 23, 1) 50%);
-    background-size: var(--cell-size) var(--cell-size);
+  /* circles pattern */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image: radial-gradient(
+    ellipse farthest-corner at var(--cell-size) var(--cell-size),
+    #571f1f,
+    #571f1f 50%,
+    rgba(46, 23, 23, 1) 50%
+  );
+  background-size: var(--cell-size) var(--cell-size);
 }
 #game-container.level-15 #board {
-    /* geometric */
-    background-color: rgba(45, 46, 23, 1);
-    opacity: 1;
-    background-image: linear-gradient(30deg, #57541f 12%, transparent 12.5%, transparent 87%, #57541f 87.5%, #57541f), linear-gradient(150deg, #57541f 12%, transparent 12.5%, transparent 87%, #57541f 87.5%, #57541f), linear-gradient(30deg, #57541f 12%, transparent 12.5%, transparent 87%, #57541f 87.5%, #57541f), linear-gradient(150deg, #57541f 12%, transparent 12.5%, transparent 87%, #57541f 87.5%, #57541f), linear-gradient(60deg, #57541f77 25%, transparent 25.5%, transparent 75%, #57541f77 75%, #57541f77), linear-gradient(60deg, #57541f77 25%, transparent 25.5%, transparent 75%, #57541f77 75%, #57541f77);
-    background-size: var(--cell-size) var(--cell-size);
-    background-position: 0 0, 0 0, calc(var(--cell-size) / 2) calc(var(--cell-size) / 2), calc(var(--cell-size) / 2) calc(var(--cell-size) / 2), 0 0, calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  /* geometric */
+  background-color: rgba(45, 46, 23, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      30deg,
+      #57541f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #57541f 87.5%,
+      #57541f
+    ),
+    linear-gradient(
+      150deg,
+      #57541f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #57541f 87.5%,
+      #57541f
+    ),
+    linear-gradient(
+      30deg,
+      #57541f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #57541f 87.5%,
+      #57541f
+    ),
+    linear-gradient(
+      150deg,
+      #57541f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #57541f 87.5%,
+      #57541f
+    ),
+    linear-gradient(
+      60deg,
+      #57541f77 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #57541f77 75%,
+      #57541f77
+    ),
+    linear-gradient(
+      60deg,
+      #57541f77 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #57541f77 75%,
+      #57541f77
+    );
+  background-size: var(--cell-size) var(--cell-size);
+  background-position:
+    0 0,
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2),
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2),
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
 }
 
 #game-container.level-16 #board {
-    /* horizontal stripes */
-    background-color: rgba(23, 46, 24, 1);
-    opacity: 1;
-    background-image: linear-gradient(0deg, rgba(23, 46, 24, 1) 50%, #2a571f 50%);
-    background-size: var(--cell-size) var(--cell-size);
+  /* horizontal stripes */
+  background-color: rgba(23, 46, 24, 1);
+  opacity: 1;
+  background-image: linear-gradient(0deg, rgba(23, 46, 24, 1) 50%, #2a571f 50%);
+  background-size: var(--cell-size) var(--cell-size);
 }
 #game-container.level-17 #board {
-    /* diag stripes */
-    background-color: rgba(23, 46, 45, 1);
-    opacity: 1;
-    background-image: linear-gradient(45deg, #1f5748 50%, rgba(23, 46, 45, 1) 50%);
-    background-size: var(--cell-size) var(--cell-size);
+  /* diag stripes */
+  background-color: rgba(23, 46, 45, 1);
+  opacity: 1;
+  background-image: linear-gradient(
+    45deg,
+    #1f5748 50%,
+    rgba(23, 46, 45, 1) 50%
+  );
+  background-size: var(--cell-size) var(--cell-size);
 }
 #game-container.level-18 #board {
-    /* opposite diagonal */
-    background-color: rgba(23, 24, 46, 1);
-    opacity: 1;
-    background-image: linear-gradient(-45deg, rgba(23, 24, 46, 1), rgba(23, 24, 46, 1) 50%, #1f2857 50%, #1f2857);
-    background-size: var(--cell-size) var(--cell-size);
+  /* opposite diagonal */
+  background-color: rgba(23, 24, 46, 1);
+  opacity: 1;
+  background-image: linear-gradient(
+    -45deg,
+    rgba(23, 24, 46, 1),
+    rgba(23, 24, 46, 1) 50%,
+    #1f2857 50%,
+    #1f2857
+  );
+  background-size: var(--cell-size) var(--cell-size);
 }
 #game-container.level-19 #board {
-    /* bold vertical stripes */
-    background-color: rgba(48, 20, 20, 1);
-    opacity: 1;
-    background-image: linear-gradient(to right, #422828, #422828 var(--gap-size), rgba(48, 20, 20, 1) var(--gap-size), rgba(48, 20, 20, 1));
-    background-size: var(--cell-size) 100%;
+  /* bold vertical stripes */
+  background-color: rgba(48, 20, 20, 1);
+  opacity: 1;
+  background-image: linear-gradient(
+    to right,
+    #422828,
+    #422828 var(--gap-size),
+    rgba(48, 20, 20, 1) var(--gap-size),
+    rgba(48, 20, 20, 1)
+  );
+  background-size: var(--cell-size) 100%;
 }
 #game-container.level-20 #board {
-    /* Dotted Grid Pattern */
-    background-color: rgba(23, 39, 46, 1);
-    opacity: 1;
-    background-image: radial-gradient(#1f4457 var(--gap-size), transparent var(--gap-size)), radial-gradient(#1f4457 var(--gap-size), rgba(23, 39, 46, 1) var(--gap-size));
-    background-size: var(--cell-size) var(--cell-size);
-    background-position: 0 0, calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  /* Dotted Grid Pattern */
+  background-color: rgba(23, 39, 46, 1);
+  opacity: 1;
+  background-image:
+    radial-gradient(#1f4457 var(--gap-size), transparent var(--gap-size)),
+    radial-gradient(
+      #1f4457 var(--gap-size),
+      rgba(23, 39, 46, 1) var(--gap-size)
+    );
+  background-size: var(--cell-size) var(--cell-size);
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
 }
 #game-container.level-21 #board {
-    /* Honeycomb pattern */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(30deg, #571f1f 12%, transparent 12.5%, transparent 87%, #571f1f 87.5%, #571f1f),
-        linear-gradient(150deg, #571f1f 12%, transparent 12.5%, transparent 87%, #571f1f 87.5%, #571f1f),
-        linear-gradient(30deg, #571f1f 12%, transparent 12.5%, transparent 87%, #571f1f 87.5%, #571f1f),
-        linear-gradient(150deg, #571f1f 12%, transparent 12.5%, transparent 87%, #571f1f 87.5%, #571f1f);
-    background-size: var(--cell-size) calc(var(--cell-size) * 1.73);
-    background-position: 0 0, 0 0, calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.865), calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.865);
+  /* Honeycomb pattern */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      30deg,
+      #571f1f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #571f1f 87.5%,
+      #571f1f
+    ),
+    linear-gradient(
+      150deg,
+      #571f1f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #571f1f 87.5%,
+      #571f1f
+    ),
+    linear-gradient(
+      30deg,
+      #571f1f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #571f1f 87.5%,
+      #571f1f
+    ),
+    linear-gradient(
+      150deg,
+      #571f1f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #571f1f 87.5%,
+      #571f1f
+    );
+  background-size: var(--cell-size) calc(var(--cell-size) * 1.73);
+  background-position:
+    0 0,
+    0 0,
+    calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.865),
+    calc(var(--cell-size) / 2) calc(var(--cell-size) * 0.865);
 }
 
 #game-container.level-22 #board {
-    /* Wavy lines */
-    background-color: rgba(23, 46, 40, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(to right, rgba(23, 46, 40, 1), rgba(23, 46, 40, 1) 5px, #173b36 5px, #173b36 10px),
-        linear-gradient(to bottom, rgba(23, 46, 40, 1), rgba(23, 46, 40, 1) 5px, #173b36 5px, #173b36 10px);
-    background-size: 20px 10px;
+  /* Wavy lines */
+  background-color: rgba(23, 46, 40, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(23, 46, 40, 1),
+      rgba(23, 46, 40, 1) 5px,
+      #173b36 5px,
+      #173b36 10px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(23, 46, 40, 1),
+      rgba(23, 46, 40, 1) 5px,
+      #173b36 5px,
+      #173b36 10px
+    );
+  background-size: 20px 10px;
 }
 
 #game-container.level-23 #board {
-    /* Diagonal checkerboard */
-    background-color: rgba(32, 23, 46, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(45deg, #311f57 25%, transparent 25%),
-        linear-gradient(-45deg, #311f57 25%, transparent 25%);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Diagonal checkerboard */
+  background-color: rgba(32, 23, 46, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(45deg, #311f57 25%, transparent 25%),
+    linear-gradient(-45deg, #311f57 25%, transparent 25%);
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-24 #board {
-    /* Concentric circles */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image: repeating-radial-gradient(circle at 50% 50%, #571f1f, #571f1f 10px, rgba(46, 23, 23, 1) 10px, rgba(46, 23, 23, 1) 20px);
+  /* Concentric circles */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image: repeating-radial-gradient(
+    circle at 50% 50%,
+    #571f1f,
+    #571f1f 10px,
+    rgba(46, 23, 23, 1) 10px,
+    rgba(46, 23, 23, 1) 20px
+  );
 }
 
 #game-container.level-25 #board {
-    /* Herringbone pattern */
-    background-color: rgba(25, 46, 23, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(45deg, #1f5731 25%, transparent 25%, transparent 75%, #1f5731 75%, #1f5731),
-        linear-gradient(-45deg, #1f5731 25%, transparent 25%, transparent 75%, #1f5731 75%, #1f5731);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Herringbone pattern */
+  background-color: rgba(25, 46, 23, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      45deg,
+      #1f5731 25%,
+      transparent 25%,
+      transparent 75%,
+      #1f5731 75%,
+      #1f5731
+    ),
+    linear-gradient(
+      -45deg,
+      #1f5731 25%,
+      transparent 25%,
+      transparent 75%,
+      #1f5731 75%,
+      #1f5731
+    );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-26 #board {
-    /* Triangular grid */
-    background-color: rgba(23, 39, 46, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(60deg, #1f4457 25%, transparent 25%),
-        linear-gradient(-60deg, #1f4457 25%, transparent 25%);
-    background-size: var(--cell-size) calc(var(--cell-size) * 1.732);
+  /* Triangular grid */
+  background-color: rgba(23, 39, 46, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(60deg, #1f4457 25%, transparent 25%),
+    linear-gradient(-60deg, #1f4457 25%, transparent 25%);
+  background-size: var(--cell-size) calc(var(--cell-size) * 1.732);
 }
 
 #game-container.level-27 #board {
-    /* Starburst pattern */
-    background-color: rgba(39, 23, 46, 1);
-    opacity: 1;
-    background-image: radial-gradient(circle at center, #401f57 0%, #401f57 30%, transparent 30%, transparent 100%);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Starburst pattern */
+  background-color: rgba(39, 23, 46, 1);
+  opacity: 1;
+  background-image: radial-gradient(
+    circle at center,
+    #401f57 0%,
+    #401f57 30%,
+    transparent 30%,
+    transparent 100%
+  );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-28 #board {
-    /* Diagonal stripes with alternating thickness */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image: repeating-linear-gradient(45deg, #571f1f, #571f1f 10px, rgba(46, 23, 23, 1) 10px, rgba(46, 23, 23, 1) 20px, #571f1f 20px, #571f1f 25px, rgba(46, 23, 23, 1) 25px, rgba(46, 23, 23, 1) 35px);
+  /* Diagonal stripes with alternating thickness */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #571f1f,
+    #571f1f 10px,
+    rgba(46, 23, 23, 1) 10px,
+    rgba(46, 23, 23, 1) 20px,
+    #571f1f 20px,
+    #571f1f 25px,
+    rgba(46, 23, 23, 1) 25px,
+    rgba(46, 23, 23, 1) 35px
+  );
 }
 
 #game-container.level-29 #board {
-    /* Overlapping circles */
-    background-color: rgba(45, 46, 23, 1);
-    opacity: 1;
-    background-image:
-        radial-gradient(circle at 0% 50%, rgba(69, 71, 31, 0.8) 0%, rgba(69, 71, 31, 0.8) 50%, transparent 50.1%),
-        radial-gradient(circle at 100% 50%, rgba(69, 71, 31, 0.8) 0%, rgba(69, 71, 31, 0.8) 50%, transparent 50.1%);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Overlapping circles */
+  background-color: rgba(45, 46, 23, 1);
+  opacity: 1;
+  background-image:
+    radial-gradient(
+      circle at 0% 50%,
+      rgba(69, 71, 31, 0.8) 0%,
+      rgba(69, 71, 31, 0.8) 50%,
+      transparent 50.1%
+    ),
+    radial-gradient(
+      circle at 100% 50%,
+      rgba(69, 71, 31, 0.8) 0%,
+      rgba(69, 71, 31, 0.8) 50%,
+      transparent 50.1%
+    );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-30 #board {
-    /* Interlocking hexagons */
-    background-color: rgba(23, 46, 24, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(30deg, #2a571f 12%, transparent 12.5%, transparent 87%, #2a571f 87.5%, #2a571f),
-        linear-gradient(150deg, #2a571f 12%, transparent 12.5%, transparent 87%, #2a571f 87.5%, #2a571f),
-        linear-gradient(30deg, #2a571f 12%, transparent 12.5%, transparent 87%, #2a571f 87.5%, #2a571f),
-        linear-gradient(150deg, #2a571f 12%, transparent 12.5%, transparent 87%, #2a571f 87.5%, #2a571f);
-    background-size: calc(var(--cell-size) * 2) calc(var(--cell-size) * 3.464);
-    background-position: 0 0, 0 0, var(--cell-size) calc(var(--cell-size) * 1.732), var(--cell-size) calc(var(--cell-size) * 1.732);
+  /* Interlocking hexagons */
+  background-color: rgba(23, 46, 24, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      30deg,
+      #2a571f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #2a571f 87.5%,
+      #2a571f
+    ),
+    linear-gradient(
+      150deg,
+      #2a571f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #2a571f 87.5%,
+      #2a571f
+    ),
+    linear-gradient(
+      30deg,
+      #2a571f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #2a571f 87.5%,
+      #2a571f
+    ),
+    linear-gradient(
+      150deg,
+      #2a571f 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #2a571f 87.5%,
+      #2a571f
+    );
+  background-size: calc(var(--cell-size) * 2) calc(var(--cell-size) * 3.464);
+  background-position:
+    0 0,
+    0 0,
+    var(--cell-size) calc(var(--cell-size) * 1.732),
+    var(--cell-size) calc(var(--cell-size) * 1.732);
 }
 
 #game-container.level-31 #board {
-    /* Diagonal zig-zag */
-    background-color: rgba(23, 46, 45, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(135deg, #1f5748 25%, transparent 25%),
-        linear-gradient(225deg, #1f5748 25%, transparent 25%);
-    background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
-    background-position: 0 0, calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
+  /* Diagonal zig-zag */
+  background-color: rgba(23, 46, 45, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(135deg, #1f5748 25%, transparent 25%),
+    linear-gradient(225deg, #1f5748 25%, transparent 25%);
+  background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
 }
 
 #game-container.level-32 #board {
-    /* Mosaic tiles */
-    background-color: rgba(23, 24, 46, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(30deg, #1f2857 12%, transparent 12.5%, transparent 87%, #1f2857 87.5%, #1f2857),
-        linear-gradient(150deg, #1f2857 12%, transparent 12.5%, transparent 87%, #1f2857 87.5%, #1f2857),
-        linear-gradient(30deg, #1f2857 12%, transparent 12.5%, transparent 87%, #1f2857 87.5%, #1f2857),
-        linear-gradient(150deg, #1f2857 12%, transparent 12.5%, transparent 87%, #1f2857 87.5%, #1f2857);
-    background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  /* Mosaic tiles */
+  background-color: rgba(23, 24, 46, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      30deg,
+      #1f2857 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #1f2857 87.5%,
+      #1f2857
+    ),
+    linear-gradient(
+      150deg,
+      #1f2857 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #1f2857 87.5%,
+      #1f2857
+    ),
+    linear-gradient(
+      30deg,
+      #1f2857 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #1f2857 87.5%,
+      #1f2857
+    ),
+    linear-gradient(
+      150deg,
+      #1f2857 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #1f2857 87.5%,
+      #1f2857
+    );
+  background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
 }
 
 #game-container.level-33 #board {
-    /* Woven pattern */
-    background-color: rgba(48, 20, 20, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(45deg, #422828 25%, transparent 25%, transparent 75%, #422828 75%, #422828),
-        linear-gradient(-45deg, #422828 25%, transparent 25%, transparent 75%, #422828 75%, #422828);
-    background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
-    background-position: 0 0, calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
+  /* Woven pattern */
+  background-color: rgba(48, 20, 20, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      45deg,
+      #422828 25%,
+      transparent 25%,
+      transparent 75%,
+      #422828 75%,
+      #422828
+    ),
+    linear-gradient(
+      -45deg,
+      #422828 25%,
+      transparent 25%,
+      transparent 75%,
+      #422828 75%,
+      #422828
+    );
+  background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
 }
 
 #game-container.level-34 #board {
-    /* Pixelated gradient */
-    background-color: rgba(23, 39, 46, 1);
-    opacity: 1;
-    background-image: linear-gradient(45deg, #1f4457 25%, transparent 25%, transparent 50%, #1f4457 50%, #1f4457 75%, transparent 75%, transparent);
-    background-size: calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
+  /* Pixelated gradient */
+  background-color: rgba(23, 39, 46, 1);
+  opacity: 1;
+  background-image: linear-gradient(
+    45deg,
+    #1f4457 25%,
+    transparent 25%,
+    transparent 50%,
+    #1f4457 50%,
+    #1f4457 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
 }
 
 #game-container.level-35 #board {
-    /* Spiral pattern */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image: conic-gradient(from 0deg at 50% 50%, #571f1f 0deg, rgba(46, 23, 23, 1) 90deg, #571f1f 180deg, rgba(46, 23, 23, 1) 270deg);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Spiral pattern */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image: conic-gradient(
+    from 0deg at 50% 50%,
+    #571f1f 0deg,
+    rgba(46, 23, 23, 1) 90deg,
+    #571f1f 180deg,
+    rgba(46, 23, 23, 1) 270deg
+  );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-36 #board {
-    /* Diamond grid */
-    background-color: rgba(23, 46, 40, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(45deg, #173b36 25%, transparent 25%, transparent 75%, #173b36 75%, #173b36),
-        linear-gradient(-45deg, #173b36 25%, transparent 25%, transparent 75%, #173b36 75%, #173b36);
-    background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
-    background-position: 0 0, calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
+  /* Diamond grid */
+  background-color: rgba(23, 46, 40, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(
+      45deg,
+      #173b36 25%,
+      transparent 25%,
+      transparent 75%,
+      #173b36 75%,
+      #173b36
+    ),
+    linear-gradient(
+      -45deg,
+      #173b36 25%,
+      transparent 25%,
+      transparent 75%,
+      #173b36 75%,
+      #173b36
+    );
+  background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
 }
 
 #game-container.level-37 #board {
-    /* Quatrefoil pattern */
-    background-color: rgba(32, 23, 46, 1);
-    opacity: 1;
-    background-image:
-        radial-gradient(circle at 0 0, #311f57 calc(var(--cell-size) / 4), transparent calc(var(--cell-size) / 4)),
-        radial-gradient(circle at 100% 0, #311f57 calc(var(--cell-size) / 4), transparent calc(var(--cell-size) / 4)),
-        radial-gradient(circle at 100% 100%, #311f57 calc(var(--cell-size) / 4), transparent calc(var(--cell-size) / 4)),
-        radial-gradient(circle at 0 100%, #311f57 calc(var(--cell-size) / 4), transparent calc(var(--cell-size) / 4));
-    background-size: var(--cell-size) var(--cell-size);
+  /* Quatrefoil pattern */
+  background-color: rgba(32, 23, 46, 1);
+  opacity: 1;
+  background-image:
+    radial-gradient(
+      circle at 0 0,
+      #311f57 calc(var(--cell-size) / 4),
+      transparent calc(var(--cell-size) / 4)
+    ),
+    radial-gradient(
+      circle at 100% 0,
+      #311f57 calc(var(--cell-size) / 4),
+      transparent calc(var(--cell-size) / 4)
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      #311f57 calc(var(--cell-size) / 4),
+      transparent calc(var(--cell-size) / 4)
+    ),
+    radial-gradient(
+      circle at 0 100%,
+      #311f57 calc(var(--cell-size) / 4),
+      transparent calc(var(--cell-size) / 4)
+    );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-38 #board {
-    /* Chevron pattern */
-    background-color: rgba(46, 23, 23, 1);
-    opacity: 1;
-    background-image:
-        linear-gradient(135deg, #571f1f 25%, transparent 25%),
-        linear-gradient(225deg, #571f1f 25%, transparent 25%);
-    background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
-    background-position: 0 0, calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
+  /* Chevron pattern */
+  background-color: rgba(46, 23, 23, 1);
+  opacity: 1;
+  background-image:
+    linear-gradient(135deg, #571f1f 25%, transparent 25%),
+    linear-gradient(225deg, #571f1f 25%, transparent 25%);
+  background-size: calc(var(--cell-size) / 2) calc(var(--cell-size) / 2);
+  background-position:
+    0 0,
+    calc(var(--cell-size) / 4) calc(var(--cell-size) / 4);
 }
 
 #game-container.level-39 #board {
-    /* Plaid pattern */
-    background-color: rgba(25, 46, 23, 1);
-    opacity: 1;
-    background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 10px, #1f5731 10px, #1f5731 20px),
-        repeating-linear-gradient(90deg, transparent, transparent 10px, #1f5731 10px, #1f5731 20px);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Plaid pattern */
+  background-color: rgba(25, 46, 23, 1);
+  opacity: 1;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 10px,
+      #1f5731 10px,
+      #1f5731 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 10px,
+      #1f5731 10px,
+      #1f5731 20px
+    );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-40 #board {
-    /* Radial sunburst */
-    background-color: rgba(23, 39, 46, 1);
-    opacity: 1;
-    background-image: repeating-conic-gradient(#1f4457 0deg 10deg, rgba(23, 39, 46, 1) 10deg 20deg);
-    background-size: var(--cell-size) var(--cell-size);
+  /* Radial sunburst */
+  background-color: rgba(23, 39, 46, 1);
+  opacity: 1;
+  background-image: repeating-conic-gradient(
+    #1f4457 0deg 10deg,
+    rgba(23, 39, 46, 1) 10deg 20deg
+  );
+  background-size: var(--cell-size) var(--cell-size);
 }
 
 #game-container.level-3 #board-guides,
@@ -646,7 +1074,7 @@ background-image: repeating-linear-gradient(
 #game-container.level-38 #board-guides,
 #game-container.level-39 #board-guides,
 #game-container.level-40 #board-guides {
-    opacity: 0;
+  opacity: 0;
 }
 
 #game-container.level-4 #board-guides,
@@ -657,260 +1085,267 @@ background-image: repeating-linear-gradient(
 #game-container.level-28 #board-guides,
 #game-container.level-33 #board-guides,
 #game-container.level-34 #board-guides,
-#game-container.level-36 #board-guides{
-    opacity: 0.09;
+#game-container.level-36 #board-guides {
+  opacity: 0.09;
 }
 
 input[type="checkbox"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 1em;
-    height: 1em;
-    background-color: #333;
-    border: 0.2em dotted #666;
-    cursor: pointer;
-    position: relative;
-    top: 0.3em;
-    margin-right: 0.4em;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  background-color: #333;
+  border: 0.2em dotted #666;
+  cursor: pointer;
+  position: relative;
+  top: 0.3em;
+  margin-right: 0.4em;
 }
 
 input[type="checkbox"]:checked {
-    background-color: white;
-    border: 0.1em solid black;
+  background-color: white;
+  border: 0.1em solid black;
 }
 label {
-    cursor: pointer;
+  cursor: pointer;
 }
 input:focus {
-    outline: none;
+  outline: none;
 }
 
 #final_screen {
-    justify-content: center;
-    text-align: center;
-    background-color: rgba(0,0,0,0.4);
-    border-radius: 0.5em;
-    padding: 0.5em;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 0.5em;
+  padding: 0.5em;
 }
 #final_screen .title {
-    font-size: 120%;
+  font-size: 120%;
 }
 .bonustitle.highscore {
-    color: #FC0;
-    font-size: 120%;
-    font-weight: bold;
+  color: #fc0;
+  font-size: 120%;
+  font-weight: bold;
 }
 .bonustitle.leaderboard {
-    color: #0CF;
-    font-size: 120%;
-    font-weight: bold;
+  color: #0cf;
+  font-size: 120%;
+  font-weight: bold;
 }
 
 .info-meter {
-    padding-top: .7em;
-    margin-bottom: -0.8em;
-    justify-content: center;
-    display: flex;
-    width: 100%;
-    margin: 0.5em;
+  padding-top: 0.7em;
+  margin-bottom: -0.8em;
+  justify-content: center;
+  display: flex;
+  width: 100%;
+  margin: 0.5em;
 }
 .meter-square {
-    display: flex;
-    width: 0.7em;
-    height: 0.7em;
-    margin: 0.1em;
-    background-color: lightgray;
-    clear:left;
+  display: flex;
+  width: 0.7em;
+  height: 0.7em;
+  margin: 0.1em;
+  background-color: lightgray;
+  clear: left;
 }
 .meter-square.active {
-    background-color: green;
+  background-color: green;
 }
 
-
 #info {
-    margin-top: 2em;
-    display: grid;
-    justify-items: center;
-    align-items: center;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-    gap: var(--gap-size);
-    padding-left: 1em;
-    background-color: #1e1e1e;
-    border-radius: 0 2em 2em 0;
+  margin-top: 2em;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: var(--gap-size);
+  padding-left: 1em;
+  background-color: #1e1e1e;
+  border-radius: 0 2em 2em 0;
 }
 
 #level-meter {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 #lines {
-    grid-column: 1;
+  grid-column: 1;
 }
 
 #level {
-    grid-column: 2;
+  grid-column: 2;
 }
 
 #score {
-    grid-column: 3;
+  grid-column: 3;
 }
 
 #score-value {
-    position: relative;
-    display: inline-block;
-    min-width: 3.6em; /* approx 6 digits */
+  position: relative;
+  display: inline-block;
+  min-width: 3.6em; /* approx 6 digits */
 }
 
 #preview {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 #up {
-    grid-column: 2;
+  grid-column: 2;
 }
 
 #left {
-    grid-column: 1;
+  grid-column: 1;
 }
 
 #bottom {
-    grid-column: 1;
+  grid-column: 1;
 }
 
 #right {
-    grid-column: 3;
+  grid-column: 3;
 }
 
 #down {
-    grid-column: 2;
+  grid-column: 2;
 }
 
 #leader_board,
 #options {
-    grid-column: span 3;
-    padding-bottom: 1em;
+  grid-column: span 3;
+  padding-bottom: 1em;
 }
 li {
-    position: relative;
+  position: relative;
 }
 
 .highlight {
-    color: #fc0;
+  color: #fc0;
 }
 
 button {
-    width: 80%;
-    height: 3em;
-    background-color: #333;
-    border-radius: 0.25em;
-    box-shadow:
-        inset calc(var(--gap-size) * -1) var(--gap-size) calc(var(--gap-size) * 2) rgba(255, 255, 255, 0.2),
-        inset var(--gap-size) var(--gap-size) calc(var(--gap-size) * 2) rgba(0, 0, 0, 0.5),
-        var(--gap-size) var(--gap-size) calc(var(--gap-size) * 2) rgba(0, 0, 0, 0.7);
-    border: 1px solid #000;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: var(--cell-size);
-    color: #d6d6d6;
-    text-shadow: calc(var(--gap-size)/1) calc(var(--gap-size)/1) var(--gap-size) rgba(0, 0, 0, 0.5);
+  width: 80%;
+  height: 3em;
+  background-color: #333;
+  border-radius: 0.25em;
+  box-shadow:
+    inset calc(var(--gap-size) * -1) var(--gap-size) calc(var(--gap-size) * 2)
+      rgba(255, 255, 255, 0.2),
+    inset var(--gap-size) var(--gap-size) calc(var(--gap-size) * 2)
+      rgba(0, 0, 0, 0.5),
+    var(--gap-size) var(--gap-size) calc(var(--gap-size) * 2) rgba(0, 0, 0, 0.7);
+  border: 1px solid #000;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--cell-size);
+  color: #d6d6d6;
+  text-shadow: calc(var(--gap-size) / 1) calc(var(--gap-size) / 1)
+    var(--gap-size) rgba(0, 0, 0, 0.5);
 }
 button#bottom {
-    width: 50%;
-    height: 2em;
-    align-self: end;
+  width: 50%;
+  height: 2em;
+  align-self: end;
 }
 button:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
-    border-radius: calc(var(--gap-size) * 2);
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 0, 0, 0.1)
+  );
+  border-radius: calc(var(--gap-size) * 2);
+  pointer-events: none;
 }
 button:disabled {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 @media (max-width: 600px) {
-    #board{
-        grid-template-columns: repeat(10, var(--cell-size-small));
-        grid-template-rows: repeat(20, var(--cell-size-small));
-        gap: var(--gap-size-small);
-        border-width: var(--gap-size-small);
-        gap: var(--gap-size-small);
-        height: var(--board-height-small);
-    }
-    #board-container {
-        height: var(--board-height-small);
-    }
+  #board {
+    grid-template-columns: repeat(10, var(--cell-size-small));
+    grid-template-rows: repeat(20, var(--cell-size-small));
+    gap: var(--gap-size-small);
+    border-width: var(--gap-size-small);
+    gap: var(--gap-size-small);
+    height: var(--board-height-small);
+  }
+  #board-container {
+    height: var(--board-height-small);
+  }
 
-    .cell {
-        width: var(--cell-size-small);
-        height: var(--cell-size-small);
-    }
-    button {
-        width: 25vw;
-        height: 14vw;
-    }
-    button#bottom {
-        width: 12vw;
-        height: 9vw;
-    }
-    #game-container {
-        flex-wrap: wrap;
-    }
-    .info-meter {
-        padding:0;
-        margin: 0;
-        width: 100%;
-    }
-    .meter-square {
-        width: 5vw;
-        height: .5vh;
-        margin: 0;
-        background-color: #888;
-    }
-    #info {
-        margin-top: 0;
-        position: relative;
-        border-radius: .5em;
-    }
-    #board-guides {
-        left: calc(var(--gap-size-small) / 2);
-        background-size:  calc(var(--cell-size-small) + var(--gap-size-small)) var(--cell-size-small);
-        background-image: repeating-linear-gradient(
-            to right,
-            rgba(255, 255, 255, 0) 0,
-            rgba(255, 255, 255, 0) var(--cell-size-small),
-            #000000 var(--gap-size-small),
-            #000000
-        );
-    }
-    #preview {
-        grid-column: 1;
-        grid-template-columns: repeat(4, calc(var(--cell-size)/2));
-        grid-template-rows: repeat(2, calc(var(--cell-size)/2));
-        height: calc(var(--preview-height)/2);
-        gap: calc(var(--gap-size)/2);
-        /*padding: 1em;*/
-    }
-    #preview .cell {
-        height: calc(var(--cell-size)/2);
-        width: calc(var(--cell-size)/2);
-    }
+  .cell {
+    width: var(--cell-size-small);
+    height: var(--cell-size-small);
+  }
+  button {
+    width: 25vw;
+    height: 14vw;
+  }
+  button#bottom {
+    width: 12vw;
+    height: 9vw;
+  }
+  #game-container {
+    flex-wrap: wrap;
+  }
+  .info-meter {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+  .meter-square {
+    width: 5vw;
+    height: 0.5vh;
+    margin: 0;
+    background-color: #888;
+  }
+  #info {
+    margin-top: 0;
+    position: relative;
+    border-radius: 0.5em;
+  }
+  #board-guides {
+    left: calc(var(--gap-size-small) / 2);
+    background-size: calc(var(--cell-size-small) + var(--gap-size-small))
+      var(--cell-size-small);
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0) var(--cell-size-small),
+      #000000 var(--gap-size-small),
+      #000000
+    );
+  }
+  #preview {
+    grid-column: 1;
+    grid-template-columns: repeat(4, calc(var(--cell-size) / 2));
+    grid-template-rows: repeat(2, calc(var(--cell-size) / 2));
+    height: calc(var(--preview-height) / 2);
+    gap: calc(var(--gap-size) / 2);
+    /*padding: 1em;*/
+  }
+  #preview .cell {
+    height: calc(var(--cell-size) / 2);
+    width: calc(var(--cell-size) / 2);
+  }
 }
 #version {
-    grid-column: 3;
-    width: 100%;
-    font-size: 75%;
-    padding-right: 4em;
-    padding-bottom: 1em;
-    margin-right: 1em;
-    text-align: right;
+  grid-column: 3;
+  width: 100%;
+  font-size: 75%;
+  padding-right: 4em;
+  padding-bottom: 1em;
+  margin-right: 1em;
+  text-align: right;
 }
