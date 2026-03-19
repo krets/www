@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="610.0" height="556">
+    <g transform="translate(36, 36) rotate(180, 269.0, 242.0)">
+        <rect x="0" y="0" width="340" height="484" rx="72" ry="72" stroke="black" fill="none" stroke-width="36" stroke-dasharray="371.09733552923257, 216, 937.2920065876976"/>
+        <line x1="206.0" y1="242.0" x2="430.0" y2="242.0" stroke="black" stroke-width="36" marker-end="url(#arrowhead)"/>
+    </g>
+    <defs>
+        <marker id="arrowhead" markerWidth="3" markerHeight="4" refX="0.5" refY="2.0" orient="auto">
+            <polygon points="0 0, 3 2.0, 0 4" fill="black"/>
+        </marker>
+    </defs>
+</svg>
+

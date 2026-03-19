@@ -1,0 +1,3 @@
+RewriteEngine on
+RewriteRule ^timer$ timer.php [NC]
+RewriteRule ^timer/(.*)$ timer.php?s=$1 [NC]

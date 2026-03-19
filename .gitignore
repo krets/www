@@ -1,1 +1,48 @@
+# IDEs
 .idea
+.DS_Store
+
+# Backups and Old Versions (Requested to keep but not track)
+*.bak
+*.bak2
+*.bak[0-9]*
+*.swp
+backup_list.txt
+untracked_files_backup.tar.gz
+krets/timer_bak/
+krets/index.html.[0-9]*
+krets/index_20[0-9][0-9]-*.html
+krets/index_20[0-9][0-9]-*.php
+krets/20[0-9][0-9]-*.html
+
+# Group B: Logs & Shell History (Requested to keep but not track)
+error_log
+bashhistory.txt
+eternalbashhistory.txt
+krets/error_log
+krets/bashhistory.txt
+krets/eternalbashhistory.txt
+
+# Group D: Large Media & Assets (Ignore)
+*.mov
+*.mp3
+*.psd
+*.gif
+*.bmp
+*.png
+
+# Group I: eBook (Ignore)
+krets/DxSd3d/
+
+# Group J: Lab/Dev Experiments (Ignore)
+krets/cgi-bin/
+krets/dev/
+krets/lab/
+krets/paintball/
+krets/dropbox/
+
+# Group F: Private/Sensitive (Ignore)
+krets/scan-my-photos_dont_share/
+krets/zoic_storage/
+krets/f991af32-0ca8-4170-a75b-7cc7edd5a97f/
+krets/.well-known/acme-challenge/

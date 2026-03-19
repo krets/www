@@ -1,0 +1,56 @@
+body{	
+	font-family: Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #FFFFFF;
+	background-color: #666666;
+	background-image: url('dotted-bg.png');
+	background-position: center;
+	padding: 0px;
+	margin: 0px;
+	height:1000px;
+}
+a{color:#458bdf;font-weight:bold;text-decoration:none;}
+a:hover{color:#fff;}
+#container{
+	width:720px;
+	height:1000px;
+	margin: 0px auto 0px auto;
+	padding: 0px;
+	background-color:#333;
+	border-style: solid;
+	border-width: 0px 3px 0px 3px;
+	border-color: #999;
+	background-image:url('diag-bg.png');
+	}
+#title{height: 138px;background-color:#000; background: url("./title01.png") no-repeat 0 0;}
+#MainNav{
+	margin: 0px;
+	padding: 0px;
+	font-size:12px;
+	background-color:#000;
+}
+#MainNav li{display: inline;}
+#MainNav li a{padding:0px 10px 0px 10px;background-color:#555;}
+#MainNav li a:hover{background-color:#333;}
+#MainNav #active{font-weight:bold; padding:0px 10px 0px 10px; background-color:#333; background-image: url('diag-bg.png');}
+#content{
+	padding:10px;
+	margin:-3px;
+	background-image:url('diag-bg.png');
+	border-style: solid;
+	border-width: 0px 3px 0px 3px;
+	border-color: #999;
+}
+.event {
+	float:left;
+	padding: 5px;
+	width: 690px; 
+	border-top-style: dashed; 
+	border-top-color: #ccc; 
+	border-top-width: 1px;
+}
+.event .date{float:left;width: 100px;}
+.event .description{position:relative; float: right;padding-right:30px; width:550px; text-align: justify;}
+
+
