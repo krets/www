@@ -60,10 +60,12 @@
         .plate-region { font-size: 11px; color: #eee; }
         .history-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
         
-        .delete-overlay { position: absolute; right: -80px; top: 0; bottom: 0; width: 80px; background: #ff3b30; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; transition: right 0.2s; }
-        .correct-overlay { position: absolute; right: -160px; top: 0; bottom: 0; width: 80px; background: #0a84ff; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; transition: right 0.2s; border-right: 1px solid #121212; }
+        .delete-overlay { position: absolute; right: -80px; top: 0; bottom: 0; width: 80px; background: #ff3b30; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: right 0.2s; }
+        .correct-overlay { position: absolute; right: -160px; top: 0; bottom: 0; width: 80px; background: #0a84ff; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: right 0.2s; border-right: 1px solid #121212; }
+        .drop-img-overlay { position: absolute; right: -240px; top: 0; bottom: 0; width: 80px; background: #5856d6; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: right 0.2s; border-right: 1px solid #121212; }
         .history-item.show-delete .delete-overlay { right: 0; }
         .history-item.show-delete .correct-overlay { right: 80px; }
+        .history-item.show-delete .drop-img-overlay { right: 160px; }
 
         .plate-thumb { height: 24px; border-radius: 2px; border: 1px solid #444; margin-right: 8px; }
         .flex-row { display: flex; align-items: center; }
@@ -112,7 +114,7 @@
 
         <div class="history-container">
             <div class="history-header">
-                <span>Recent History (Tap item to delete)</span>
+                <span id="historyTitle">History</span>
                 <button id="clearHistory" style="width: auto; padding: 2px 6px; font-size: 9px; background: #444;">Clear All</button>
             </div>
             <ul class="history-list" id="historyList"></ul>
@@ -490,7 +492,10 @@
             const cleanText = rawText.replace(/[^A-Z0-9]/gi, '').toUpperCase();
             const patternMatch = matchPlatePattern(cleanText);
             isReviewing = false;
-            const imageData = warpedCanvas.toDataURL('image/jpeg', 0.8);
+            
+            // Only store preview image if detection failed (to help with manual correction)
+            // Successful detections don't need to waste localStorage space (~20KB/ea)
+            const imageData = !patternMatch ? warpedCanvas.toDataURL('image/jpeg', 0.4) : null;
             
             if (!patternMatch) {
                 statusEl.innerHTML = `<span class="result-error">Format Error (${duration}s)</span>`;
@@ -512,7 +517,7 @@
                 return;
             }
 
-            const plateData = { id: Date.now(), ...patternMatch, timestamp: new Date().toLocaleString(), lat: lat ? lat.toFixed(5) : null, lon: lon ? lon.toFixed(5) : null, isFailed: false, imageData: imageData };
+            const plateData = { id: Date.now(), ...patternMatch, timestamp: new Date().toLocaleString(), lat: lat ? lat.toFixed(5) : null, lon: lon ? lon.toFixed(5) : null, isFailed: false, imageData: null };
             saveToHistory(plateData);
             statusEl.innerHTML = `<span class="result-success">Success! (${duration}s)</span>`;
             textResult.innerHTML = `
@@ -531,7 +536,8 @@
             if (index === -1) return;
 
             if (patternMatch) {
-                Object.assign(history[index], { ...patternMatch, isFailed: false });
+                // Clear the image once successfully corrected to save space
+                Object.assign(history[index], { ...patternMatch, isFailed: false, imageData: null });
                 localStorage.setItem('alpr_history', JSON.stringify(history));
                 renderHistory();
                 statusEl.innerHTML = `<span class="result-success">Corrected Successfully</span>`;
@@ -559,7 +565,16 @@
         }
 
         function renderHistory() {
-            const history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            const rawHistory = localStorage.getItem('alpr_history') || '[]';
+            const history = JSON.parse(rawHistory);
+            
+            // Calculate size estimation
+            const bytes = rawHistory.length; // Approximate bytes for ASCII/Base64
+            const sizeStr = bytes > 1024 * 1024 
+                ? `${(bytes / (1024 * 1024)).toFixed(2)} MB` 
+                : `${(bytes / 1024).toFixed(1)} KB`;
+            document.getElementById('historyTitle').innerText = `History (${sizeStr})`;
+
             historyList.innerHTML = history.map(item => `
                 <li class="history-item ${item.isFailed ? 'failed' : ''}" onclick="toggleDelete(this)">
                     <div class="history-top">
@@ -576,6 +591,7 @@
                         </div>
                         <span class="plate-meta">${item.year || ""}</span>
                     </div>
+                    ${item.imageData ? `<div class="drop-img-overlay" onclick="deletePreview(event, ${item.id})">DROP IMG</div>` : ""}
                     <div class="correct-overlay" onclick="triggerCorrection(event, ${item.id})">CORRECT</div>
                     <div class="delete-overlay" onclick="deleteItem(event, ${item.id})">DELETE</div>
                 </li>
@@ -584,6 +600,17 @@
 
         window.toggleDelete = (el) => el.classList.toggle('show-delete');
         
+        window.deletePreview = (e, id) => {
+            e.stopPropagation();
+            let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            const index = history.findIndex(item => item.id === id);
+            if (index !== -1) {
+                history[index].imageData = null;
+                localStorage.setItem('alpr_history', JSON.stringify(history));
+                renderHistory();
+            }
+        };
+
         window.triggerCorrection = (e, id) => {
             e.stopPropagation();
             let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
