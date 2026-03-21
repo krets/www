@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ALPR - Robust Vision</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="onOpenCvReady();"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; margin: 0; padding: 15px; background: #121212; color: #fff; }
+        .container { display: flex; flex-direction: column; gap: 12px; }
+        
+        /* Video & Canvas */
+        .video-wrapper { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; line-height: 0; display: none; }
+        video, #frozenCanvas { width: 100%; display: block; }
+        #frozenCanvas { position: absolute; top: 0; left: 0; z-index: 5; }
+        #overlayCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        canvas.hidden { display: none; }
+        
+        /* Controls */
+        .controls { display: flex; flex-direction: column; gap: 8px; background: #1e1e1e; padding: 12px; border-radius: 8px; }
+        .btn-group { display: flex; gap: 8px; }
+        button { background: #333; color: #888; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: bold; width: 100%; cursor: not-allowed; transition: background 0.3s; }
+        
+        button.ready { background: #0a84ff; color: white; cursor: pointer; }
+        button.scanning { background: #ff3b30; color: white; cursor: pointer; animation: pulse-red 1.5s infinite; }
+        button.aiming { background: #ff9900; color: white; cursor: pointer; }
+        button.armed { background: #ff9900; color: white; cursor: pointer; }
+        button.disarmed { background: #32d74b; color: white; cursor: pointer; }
+
+        .sys-status { font-size: 11px; color: #aaa; display: flex; justify-content: space-between; padding: 0 5px; }
+        .sys-status span.ready { color: #32d74b; }
+        .status-msg { text-align: center; font-size: 14px; min-height: 1.2em; }
+        .processing { color: #0a84ff; animation: pulse-blue 1s infinite; font-weight: bold; }
+        .result-success { color: #32d74b; }
+        .result-error { color: #ff3b30; font-weight: bold; }
+        .result-failed { color: #ff9900; font-weight: bold; }
+
+        /* Output */
+        .output { background: #1e1e1e; padding: 12px; border-radius: 8px; font-size: 14px; }
+        #warpedCanvas { width: 100%; margin-top: 10px; border: 1px solid #333; background: #000; }
+        .correction-ui { margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
+        .correction-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #333; color: white; margin: 8px 0; box-sizing: border-box; font-family: monospace; text-transform: uppercase; font-size: 18px; text-align: center; }
+        .action-group { display: flex; gap: 8px; margin-top: 12px; }
+        .btn-approve { background: #32d74b; color: white; }
+        .btn-retry { background: #ff3b30; color: white; }
+        .btn-save { background: #0a84ff; color: white; }
+
+        /* History */
+        .history-container { background: #1e1e1e; border-radius: 8px; overflow: hidden; }
+        .history-header { padding: 8px 12px; background: #333; font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .history-list { max-height: 400px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+        .history-item { padding: 10px 12px; border-bottom: 1px solid #222; position: relative; overflow: hidden; display: flex; flex-direction: column; transition: background 0.2s; cursor: pointer; }
+        .history-item:active { background: #2a2a2a; }
+        .history-item.failed .plate-number { color: #ff9900; }
+        .history-item.failed .plate-region { color: #666; }
+        .history-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .plate-number { font-weight: bold; color: #0a84ff; font-family: monospace; font-size: 15px; }
+        .plate-meta { font-size: 10px; color: #666; margin-top: 2px; }
+        .plate-region { font-size: 11px; color: #eee; }
+        .history-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
+        
+        .delete-overlay { position: absolute; right: -80px; top: 0; bottom: 0; width: 80px; background: #ff3b30; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; transition: right 0.2s; }
+        .correct-overlay { position: absolute; right: -160px; top: 0; bottom: 0; width: 80px; background: #0a84ff; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; transition: right 0.2s; border-right: 1px solid #121212; }
+        .history-item.show-delete .delete-overlay { right: 0; }
+        .history-item.show-delete .correct-overlay { right: 80px; }
+
+        .plate-thumb { height: 24px; border-radius: 2px; border: 1px solid #444; margin-right: 8px; }
+        .flex-row { display: flex; align-items: center; }
+
+        .hidden { display: none; }
+        @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        @keyframes pulse-blue { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="video-wrapper" id="videoWrapper">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="frozenCanvas" class="hidden"></canvas>
+            <canvas id="overlayCanvas"></canvas>
+            <canvas id="processCanvas" class="hidden"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="sys-status">
+                <span id="camStatus">Camera: Off</span>
+                <span id="gpsStatus">GPS: Off</span>
+                <span id="cvStatus">CV: Loading</span>
+                <span id="ocrStatus">OCR: Loading</span>
+            </div>
+            
+            <div class="btn-group">
+                <button id="armBtn" disabled style="flex: 1;">Initializing...</button>
+                <div id="scanGroup" class="btn-group hidden" style="flex: 1.5;">
+                    <button id="captureBtn" class="ready">Start</button>
+                </div>
+            </div>
+            <div id="status" class="status-msg">Initializing...</div>
+        </div>
+
+        <div class="output hidden" id="resultDiv">
+            <div id="textResult"></div>
+            <strong>Straightened Plate Preview:</strong><br>
+            <canvas id="warpedCanvas"></canvas>
+            <div class="action-group" id="ocrActions">
+                <button id="retryBtn" class="ready btn-retry">Retry Scan</button>
+                <button id="approveBtn" class="ready btn-approve">Process OCR</button>
+            </div>
+        </div>
+
+        <div class="history-container">
+            <div class="history-header">
+                <span>Recent History (Tap item to delete)</span>
+                <button id="clearHistory" style="width: auto; padding: 2px 6px; font-size: 9px; background: #444;">Clear All</button>
+            </div>
+            <ul class="history-list" id="historyList"></ul>
+        </div>
+    </div>
+
+    <script>
+        let REGIONS = {};
+        let patternsLoaded = false;
+
+        async function loadPatterns() {
+            try {
+                const response = await fetch('plate_patterns.json');
+                REGIONS = await response.json();
+                patternsLoaded = true;
+                document.getElementById('cvStatus').innerText = "CV: OK"; // Re-using CV status for patterns
+                checkReadyState();
+            } catch (e) {
+                console.error("Failed to load plate patterns:", e);
+                statusEl.innerText = "Error: Patterns missing.";
+            }
+        }
+        loadPatterns();
+
+        function getUKRegionData(tag) {
+            const letter1 = tag.charAt(0);
+            const letter2 = tag.charAt(1);
+            const regions = {
+                'A': { name: 'Anglia', offices: { 'A-N': 'Peterborough', 'O-U': 'Norwich', 'V-Y': 'Ipswich' } },
+                'B': { name: 'Birmingham', offices: { 'A-Y': 'Birmingham' } },
+                'C': { name: 'Cymru (Wales)', offices: { 'A-O': 'Cardiff', 'P-V': 'Swansea', 'W-Y': 'Bangor' } },
+                'D': { name: 'Deeside', offices: { 'A-K': 'Chester', 'L-Y': 'Shrewsbury' } },
+                'E': { name: 'Essex', offices: { 'A-Y': 'Chelmsford' } },
+                'F': { name: 'Forest and Fens', offices: { 'A-P': 'Nottingham', 'R-Y': 'Lincoln' } },
+                'G': { name: 'Garden of England', offices: { 'A-O': 'Maidstone', 'P-Y': 'Brighton' } },
+                'H': { name: 'Hampshire & Dorset', offices: { 'A-J': 'Bournemouth', 'K-Y': 'Portsmouth' } },
+                'K': { name: 'Milton Keynes', offices: { 'A-L': 'Borehamwood', 'M-Y': 'Northampton' } },
+                'L': { name: 'London', offices: { 'A-J': 'Wimbledon', 'K-T': 'Stanmore', 'U-Y': 'Sidcup' } },
+                'M': { name: 'Manchester & Merseyside', offices: { 'A-L': 'Manchester', 'M-Y': 'Isle of Man / Liverpool' } },
+                'N': { name: 'North', offices: { 'A-O': 'Newcastle', 'P-Y': 'Stockton' } },
+                'O': { name: 'Oxford', offices: { 'A-Y': 'Oxford' } },
+                'P': { name: 'Preston', offices: { 'A-T': 'Preston', 'U-Y': 'Carlisle' } },
+                'R': { name: 'Reading', offices: { 'A-Y': 'Reading' } },
+                'S': { name: 'Scotland', offices: { 'A-J': 'Glasgow', 'K-O': 'Edinburgh', 'P-T': 'Dundee', 'U-W': 'Aberdeen', 'X-Y': 'Inverness' } },
+                'V': { name: 'Severn Valley', offices: { 'A-Y': 'Worcester' } },
+                'W': { name: 'West of England', offices: { 'A-J': 'Exeter', 'K-L': 'Truro', 'M-Y': 'Bristol' } },
+                'Y': { name: 'Yorkshire', offices: { 'A-K': 'Leeds', 'L-U': 'Sheffield', 'V-Y': 'Beverley' } }
+            };
+            const region = regions[letter1];
+            if (!region) return { region: "Unknown", office: "Unknown" };
+            let office = "Unknown";
+            for (const [range, name] of Object.entries(region.offices)) {
+                const [start, end] = range.split('-');
+                if (letter2 >= start && letter2 <= end) { office = name; break; }
+            }
+            return { region: region.name, office: office };
+        }
+
+        function matchPlatePattern(cleanText) {
+            if (!patternsLoaded) return null;
+
+            // UK (GB) Pattern: AA11 AAA
+            const ukMatch = cleanText.match(/^([A-Z]{2})([0-9]{2})([A-Z]{3})$/);
+            if (ukMatch) {
+                const ukData = getUKRegionData(ukMatch[1]);
+                const age = parseInt(ukMatch[2]);
+                const period = age >= 51 ? `Late 20${age-50}` : `Early 20${age}`;
+                return { country: 'UK', plate: ukMatch[0], region: `${ukData.region}, ${ukData.office}`, year: period };
+            }
+
+            // Germany (D) Pattern: B AB 1234 (1-3 letters, 1-2 letters, 1-4 digits)
+            const deMatch = cleanText.match(/^([A-Z]{1,3})([A-Z]{1,2})(\d{1,4})$/);
+            if (deMatch) {
+                const cityCode = deMatch[1];
+                const region = REGIONS.DE[cityCode] || "Germany (Unknown City)";
+                return { country: 'DE', plate: `${deMatch[1]} ${deMatch[2]} ${deMatch[3]}`, region: region, year: 'Modern' };
+            }
+
+            // Switzerland (CH) Pattern: ZH 123456 (2 letters, 1-6 digits)
+            const chMatch = cleanText.match(/^([A-Z]{2})(\d{1,6})$/);
+            if (chMatch) {
+                const region = REGIONS.CH[chMatch[1]] || "Switzerland (Unknown Canton)";
+                return { country: 'CH', plate: `${chMatch[1]} ${chMatch[2]}`, region: region, year: 'Modern' };
+            }
+
+            // Austria (A) Pattern: W 12345 A (1-2 letters, 3-6 alphanumeric)
+            const aMatch = cleanText.match(/^([A-Z]{1,2})(\d{3,6}[A-Z]{0,2})$/);
+            if (aMatch) {
+                const region = REGIONS.A[aMatch[1]] || "Austria (Unknown District)";
+                return { country: 'A', plate: `${aMatch[1]} ${aMatch[2]}`, region: region, year: 'Modern' };
+            }
+
+            // Poland (PL) Pattern: WA 12345 (2-3 letters, 4-5 alphanumeric)
+            const plMatch = cleanText.match(/^([A-Z]{2,3})([A-Z0-9]{4,5})$/);
+            if (plMatch) {
+                const cityCode = plMatch[1];
+                const region = REGIONS.PL[cityCode] || "Poland (Unknown City)";
+                return { country: 'PL', plate: `${plMatch[1]} ${plMatch[2]}`, region: region, year: 'Modern' };
+            }
+
+            return null;
+        }
+
+        const video = document.getElementById('video');
+        const frozenCanvas = document.getElementById('frozenCanvas');
+        const videoWrapper = document.getElementById('videoWrapper');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const overlayCtx = overlayCanvas.getContext('2d');
+        const processCanvas = document.getElementById('processCanvas');
+        const warpedCanvas = document.getElementById('warpedCanvas');
+        const statusEl = document.getElementById('status');
+        const armBtn = document.getElementById('armBtn');
+        const scanGroup = document.getElementById('scanGroup');
+        const captureBtn = document.getElementById('captureBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const approveBtn = document.getElementById('approveBtn');
+        const resultDiv = document.getElementById('resultDiv');
+        const textResult = document.getElementById('textResult');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        const gpsStatusEl = document.getElementById('gpsStatus');
+        const camStatusEl = document.getElementById('camStatus');
+
+        let isArmed = false, isDetecting = false, isAiming = false, isReviewing = false;
+        let openCvReady = false, tesseractReady = false;
+        let stream = null, videoTrack = null, tesseractWorker = null;
+        let srcMat, grayMat, blurMat, edgesMat;
+        let lastDetectedPoints = null;
+        let ocrStartTime = 0;
+        
+        let gpsWatcher = null;
+        let lastKnownCoords = { lat: null, lon: null };
+
+        async function initTesseract() {
+            tesseractWorker = await Tesseract.createWorker('eng');
+            await tesseractWorker.setParameters({
+                tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',
+                tessedit_pageseg_mode: '7',
+            });
+            tesseractReady = true;
+            document.getElementById('ocrStatus').innerText = "OCR: OK";
+            checkReadyState();
+        }
+        initTesseract();
+
+        function onOpenCvReady() {
+            openCvReady = true;
+            document.getElementById('cvStatus').innerText = "CV: OK";
+            checkReadyState();
+        }
+
+        function checkReadyState() {
+            if (openCvReady && tesseractReady && patternsLoaded) {
+                statusEl.innerText = "Scanner Ready.";
+                armBtn.disabled = false; armBtn.className = 'armed';
+                armBtn.innerText = "Turn On";
+                grayMat = new cv.Mat(); blurMat = new cv.Mat(); edgesMat = new cv.Mat();
+                renderHistory();
+            }
+        }
+
+        async function toggleHardware(arm) {
+            if (arm) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: { exact: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } } 
+                    });
+                } catch (e) {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                }
+                video.srcObject = stream;
+                videoTrack = stream.getVideoTracks()[0];
+                await new Promise(resolve => video.onloadedmetadata = resolve);
+                
+                overlayCanvas.width = video.videoWidth; overlayCanvas.height = video.videoHeight;
+                frozenCanvas.width = video.videoWidth; frozenCanvas.height = video.videoHeight;
+                processCanvas.width = video.videoWidth; processCanvas.height = video.videoHeight;
+                
+                gpsStatusEl.innerText = "GPS: Waiting...";
+                gpsStatusEl.classList.remove('ready');
+                gpsWatcher = navigator.geolocation.watchPosition((pos) => {
+                    lastKnownCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                    gpsStatusEl.innerText = "GPS: OK";
+                    gpsStatusEl.classList.add('ready');
+                }, (err) => {
+                    gpsStatusEl.innerText = "GPS: Offline";
+                    gpsStatusEl.classList.remove('ready');
+                }, { enableHighAccuracy: true, maximumAge: 5000 });
+
+                isArmed = true;
+                armBtn.innerText = "Turn Off"; armBtn.className = "disarmed";
+                scanGroup.classList.remove('hidden');
+                camStatusEl.innerText = "Camera: ON";
+                camStatusEl.classList.add('ready');
+                statusEl.innerText = "Scanner Active.";
+            } else {
+                if (videoTrack) videoTrack.stop();
+                if (gpsWatcher) navigator.geolocation.clearWatch(gpsWatcher);
+                video.srcObject = null;
+                isArmed = false; isDetecting = false; isAiming = false; isReviewing = false;
+                lastKnownCoords = { lat: null, lon: null };
+                armBtn.innerText = "Turn On"; armBtn.className = "armed";
+                scanGroup.classList.add('hidden');
+                videoWrapper.style.display = 'none';
+                camStatusEl.innerText = "Camera: Off";
+                camStatusEl.classList.remove('ready');
+                gpsStatusEl.innerText = "GPS: Off";
+                gpsStatusEl.classList.remove('ready');
+                statusEl.innerText = "Hardware Offline.";
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                captureBtn.className = 'ready'; captureBtn.innerText = 'Start';
+            }
+        }
+
+        armBtn.addEventListener('click', () => toggleHardware(!isArmed));
+
+        captureBtn.addEventListener('click', () => {
+            if (!isArmed) return;
+            if (isReviewing || !resultDiv.classList.contains('hidden')) {
+                isReviewing = false;
+                resultDiv.classList.add('hidden');
+                if (!videoTrack || videoTrack.readyState === 'ended') {
+                    toggleHardware(true).then(() => startScanning());
+                } else {
+                    startScanning();
+                }
+                return;
+            }
+            if (isDetecting) {
+                if (lastDetectedPoints) {
+                    freezePreview();
+                    isDetecting = false; isReviewing = true;
+                    statusEl.innerText = "Capture Successful.";
+                    drawOverlay(lastDetectedPoints, "#00ff00");
+                    warpPlate(lastDetectedPoints);
+                    videoWrapper.style.display = 'none';
+                } else {
+                    isDetecting = false;
+                    videoWrapper.style.display = 'none';
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                }
+                captureBtn.className = 'ready'; captureBtn.innerText = 'Start';
+            } else {
+                startScanning();
+            }
+        });
+
+        function startScanning() {
+            isDetecting = true; lastDetectedPoints = null;
+            videoWrapper.style.display = 'block';
+            frozenCanvas.classList.add('hidden');
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            captureBtn.className = 'scanning'; captureBtn.innerText = "Scanning...";
+            statusEl.innerText = "Searching...";
+            requestAnimationFrame(processVideo);
+        }
+
+        function freezePreview() {
+            const ctx = frozenCanvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, frozenCanvas.width, frozenCanvas.height);
+            frozenCanvas.classList.remove('hidden');
+            if (videoTrack) videoTrack.stop();
+        }
+
+        retryBtn.addEventListener('click', () => {
+            isReviewing = false; resultDiv.classList.add('hidden');
+            videoWrapper.style.display = 'block';
+            toggleHardware(true).then(() => startScanning());
+        });
+
+        approveBtn.addEventListener('click', () => {
+            document.getElementById('ocrActions').classList.add('hidden');
+            statusEl.innerHTML = '<span class="processing">Running Tesseract Engine...</span>';
+            ocrStartTime = performance.now();
+            runOCR();
+        });
+
+        function processVideo() {
+            if (!isDetecting || isReviewing || !isArmed) return;
+            const points = extractPlateEdges(overlayCtx); 
+            if (points) {
+                lastDetectedPoints = points;
+                captureBtn.className = 'scanning aiming'; 
+                captureBtn.innerText = "Capture";
+                drawOverlay(points, "#32d74b");
+            } else {
+                if (lastDetectedPoints) drawOverlay(lastDetectedPoints, "rgba(50, 215, 75, 0.3)");
+            }
+            requestAnimationFrame(processVideo);
+        }
+
+        function extractPlateEdges(debugCtx) {
+            const vw = video.videoWidth; const vh = video.videoHeight;
+            if (vw === 0) return null;
+            const scale = Math.min(1.0, 640 / vw);
+            const sw = Math.floor(vw * scale); const sh = Math.floor(vh * scale);
+            processCanvas.width = sw; processCanvas.height = sh;
+            const processCtx = processCanvas.getContext('2d');
+            processCtx.drawImage(video, 0, 0, sw, sh);
+            if (!srcMat || srcMat.cols !== sw || srcMat.rows !== sh) {
+                if (srcMat) srcMat.delete();
+                srcMat = new cv.Mat(sh, sw, cv.CV_8UC4);
+            }
+            srcMat.data.set(processCtx.getImageData(0, 0, sw, sh).data);
+            cv.cvtColor(srcMat, grayMat, cv.COLOR_RGBA2GRAY);
+            cv.GaussianBlur(grayMat, blurMat, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT);
+            cv.Canny(blurMat, edgesMat, 50, 150);
+            let contours = new cv.MatVector(); let hierarchy = new cv.Mat();
+            cv.findContours(edgesMat, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+            let possiblePlates = [];
+            if (debugCtx) debugCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            for (let i = 0; i < contours.size(); ++i) {
+                let cnt = contours.get(i);
+                let area = cv.contourArea(cnt);
+                if (area > (1500 * scale * scale)) {
+                    let peri = cv.arcLength(cnt, true);
+                    let approx = new cv.Mat();
+                    cv.approxPolyDP(cnt, approx, 0.02 * peri, true);
+                    if (approx.rows === 4) {
+                        let rect = cv.boundingRect(approx);
+                        let aspectRatio = rect.width / rect.height;
+                        if (aspectRatio >= 2.2 && aspectRatio <= 6.0) {
+                            let pts = [];
+                            for (let j = 0; j < 4; j++) pts.push({ x: approx.data32S[j * 2] / scale, y: approx.data32S[j * 2 + 1] / scale });
+                            possiblePlates.push({ area: area, points: orderPoints(pts) });
+                        }
+                    }
+                    approx.delete();
+                }
+                cnt.delete();
+            }
+            contours.delete(); hierarchy.delete();
+            if (possiblePlates.length > 0) {
+                possiblePlates.sort((a, b) => b.area - a.area);
+                return possiblePlates[0].points;
+            }
+            return null;
+        }
+
+        function warpPlate(points) {
+            const width = 600; const height = 150; 
+            const vw = video.videoWidth; const vh = video.videoHeight;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = vw; tempCanvas.height = vh;
+            tempCanvas.getContext('2d').drawImage(frozenCanvas, 0, 0);
+            let fullSrc = cv.imread(tempCanvas);
+            const center = points.reduce((acc, p) => ({x: acc.x + p.x/4, y: acc.y + p.y/4}), {x:0, y:0});
+            const expandedPoints = points.map(p => ({
+                x: Math.max(0, Math.min(vw, center.x + (p.x - center.x) * 1.15)),
+                y: Math.max(0, Math.min(vh, center.y + (p.y - center.y) * 1.15))
+            }));
+            let srcCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [expandedPoints[0].x, expandedPoints[0].y, expandedPoints[1].x, expandedPoints[1].y, expandedPoints[2].x, expandedPoints[2].y, expandedPoints[3].x, expandedPoints[3].y]);
+            let dstCoords = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, width, 0, width, height, 0, height]);
+            let M = cv.getPerspectiveTransform(srcCoords, dstCoords);
+            let warpedMat = new cv.Mat();
+            cv.warpPerspective(fullSrc, warpedMat, M, new cv.Size(width, height), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+            cv.cvtColor(warpedMat, warpedMat, cv.COLOR_RGBA2GRAY);
+            warpedCanvas.width = width; warpedCanvas.height = height;
+            cv.imshow('warpedCanvas', warpedMat);
+            resultDiv.classList.remove('hidden');
+            textResult.innerHTML = "Confirming plate crop...";
+            document.getElementById('ocrActions').classList.remove('hidden');
+            cv.threshold(warpedMat, warpedMat, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU);
+            cv.imshow('warpedCanvas', warpedMat);
+            fullSrc.delete(); srcCoords.delete(); dstCoords.delete(); M.delete(); warpedMat.delete();
+        }
+
+        async function runOCR() {
+            const { data: { text } } = await tesseractWorker.recognize(warpedCanvas);
+            const duration = ((performance.now() - ocrStartTime) / 1000).toFixed(2);
+            processPlate(text, lastKnownCoords.lat, lastKnownCoords.lon, duration);
+        }
+
+        function processPlate(rawText, lat, lon, duration) {
+            const cleanText = rawText.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+            const patternMatch = matchPlatePattern(cleanText);
+            isReviewing = false;
+            const imageData = warpedCanvas.toDataURL('image/jpeg', 0.8);
+            
+            if (!patternMatch) {
+                statusEl.innerHTML = `<span class="result-error">Format Error (${duration}s)</span>`;
+                const failedEntry = { id: Date.now(), plate: cleanText || "???", isFailed: true, imageData: imageData, timestamp: new Date().toLocaleString(), lat: lat ? lat.toFixed(5) : null, lon: lon ? lon.toFixed(5) : null, country: "Unknown" };
+                saveToHistory(failedEntry);
+                
+                textResult.innerHTML = `
+                    <span class="result-error">Raw OCR: ${cleanText || "None"}</span><br>Invalid plate format.
+                    <div class="correction-ui">
+                        <strong>Manual Correction:</strong>
+                        <input type="text" id="manualInput" class="correction-input" value="${cleanText}" maxlength="10" placeholder="e.g. B AB 123">
+                        <button id="saveCorrectionBtn" class="ready btn-save">Save Correction</button>
+                    </div>
+                `;
+                document.getElementById('ocrActions').classList.add('hidden');
+                document.getElementById('saveCorrectionBtn').addEventListener('click', () => {
+                    applyCorrection(failedEntry.id, document.getElementById('manualInput').value);
+                });
+                return;
+            }
+
+            const plateData = { id: Date.now(), ...patternMatch, timestamp: new Date().toLocaleString(), lat: lat ? lat.toFixed(5) : null, lon: lon ? lon.toFixed(5) : null, isFailed: false, imageData: imageData };
+            saveToHistory(plateData);
+            statusEl.innerHTML = `<span class="result-success">Success! (${duration}s)</span>`;
+            textResult.innerHTML = `
+                <div class="result-success" style="font-size: 22px; font-weight: bold; font-family: monospace;">${plateData.plate}</div>
+                <strong>${plateData.country}: ${plateData.region}</strong><br>${plateData.year}
+            `;
+            captureBtn.className = 'ready'; captureBtn.innerText = 'Start';
+        }
+
+        function applyCorrection(id, text) {
+            const cleanText = text.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+            const patternMatch = matchPlatePattern(cleanText);
+            
+            let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            const index = history.findIndex(item => item.id === id);
+            if (index === -1) return;
+
+            if (patternMatch) {
+                Object.assign(history[index], { ...patternMatch, isFailed: false });
+                localStorage.setItem('alpr_history', JSON.stringify(history));
+                renderHistory();
+                statusEl.innerHTML = `<span class="result-success">Corrected Successfully</span>`;
+                textResult.innerHTML = `
+                    <div class="result-success" style="font-size: 22px; font-weight: bold; font-family: monospace;">${patternMatch.plate}</div>
+                    <strong>${patternMatch.country}: ${patternMatch.region}</strong><br>${patternMatch.year}
+                `;
+                captureBtn.className = 'ready'; captureBtn.innerText = 'Start';
+            } else {
+                history[index].plate = cleanText;
+                localStorage.setItem('alpr_history', JSON.stringify(history));
+                renderHistory();
+                statusEl.innerHTML = `<span class="result-failed">Updated (Pattern Still Unknown)</span>`;
+                textResult.innerHTML = `<div class="result-failed" style="font-size: 22px; font-weight: bold; font-family: monospace;">${cleanText}</div>Pattern mismatch, but saved.`;
+                captureBtn.className = 'ready'; captureBtn.innerText = 'Start';
+            }
+        }
+
+        function saveToHistory(data) {
+            let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            history.unshift(data);
+            if (history.length > 100) history.pop();
+            localStorage.setItem('alpr_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            historyList.innerHTML = history.map(item => `
+                <li class="history-item ${item.isFailed ? 'failed' : ''}" onclick="toggleDelete(this)">
+                    <div class="history-top">
+                        <div class="flex-row">
+                            ${item.imageData ? `<img src="${item.imageData}" class="plate-thumb">` : ""}
+                            <span class="plate-number">${item.plate}</span>
+                        </div>
+                        <span class="plate-region">${item.country ? (item.country + ': ') : ''}${item.region || "Unknown"}</span>
+                    </div>
+                    <div class="history-bottom">
+                        <div class="plate-info">
+                            <span class="plate-meta">${item.timestamp}</span>
+                            ${item.lat ? `<span class="plate-meta" style="color:#555"> GPS: ${item.lat}, ${item.lon}</span>` : ""}
+                        </div>
+                        <span class="plate-meta">${item.year || ""}</span>
+                    </div>
+                    <div class="correct-overlay" onclick="triggerCorrection(event, ${item.id})">CORRECT</div>
+                    <div class="delete-overlay" onclick="deleteItem(event, ${item.id})">DELETE</div>
+                </li>
+            `).join('');
+        }
+
+        window.toggleDelete = (el) => el.classList.toggle('show-delete');
+        
+        window.triggerCorrection = (e, id) => {
+            e.stopPropagation();
+            let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            const item = history.find(i => i.id === id);
+            if (!item) return;
+
+            const userInput = prompt("Correct Plate Number (e.g., AB12CDE):", item.plate);
+            if (userInput !== null) {
+                applyCorrection(id, userInput);
+            }
+        };
+
+        window.deleteItem = (e, id) => {
+            e.stopPropagation();
+            let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
+            history = history.filter(item => item.id !== id);
+            localStorage.setItem('alpr_history', JSON.stringify(history));
+            renderHistory();
+        };
+
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm("Clear all?")) { localStorage.setItem('alpr_history', '[]'); renderHistory(); }
+        });
+
+        function orderPoints(pts) {
+            pts.sort((a, b) => a.x - b.x);
+            let left = pts.slice(0, 2).sort((a, b) => a.y - b.y);
+            let right = pts.slice(2, 4).sort((a, b) => a.y - b.y);
+            return [left[0], right[0], right[1], left[1]]; 
+        }
+
+        function drawOverlay(points, color) {
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            overlayCtx.strokeStyle = color; overlayCtx.lineWidth = 6;
+            overlayCtx.beginPath(); overlayCtx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < 4; i++) overlayCtx.lineTo(points[i].x, points[i].y);
+            overlayCtx.closePath(); overlayCtx.stroke();
+        }
+    </script>
+</body>
+</html>
