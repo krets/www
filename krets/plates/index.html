@@ -130,7 +130,7 @@
                 const response = await fetch('plate_patterns.json');
                 REGIONS = await response.json();
                 patternsLoaded = true;
-                document.getElementById('cvStatus').innerText = "CV: OK"; // Re-using CV status for patterns
+                document.getElementById('cvStatus').innerText = "CV: OK";
                 checkReadyState();
             } catch (e) {
                 console.error("Failed to load plate patterns:", e);
@@ -176,45 +176,85 @@
         function matchPlatePattern(cleanText) {
             if (!patternsLoaded) return null;
 
-            // UK (GB) Pattern: AA11 AAA
-            const ukMatch = cleanText.match(/^([A-Z]{2})([0-9]{2})([A-Z]{3})$/);
-            if (ukMatch) {
-                const ukData = getUKRegionData(ukMatch[1]);
-                const age = parseInt(ukMatch[2]);
-                const period = age >= 51 ? `Late 20${age-50}` : `Early 20${age}`;
-                return { country: 'UK', plate: ukMatch[0], region: `${ukData.region}, ${ukData.office}`, year: period };
+            const OCR_REPLACEMENTS = {
+                '5': 'S', 'S': '5', '0': 'O', 'O': '0', '1': 'I', 'I': '1', 
+                '8': 'B', 'B': '8', '2': 'Z', 'Z': '2', '6': 'G', 'G': '6'
+            };
+
+            function tryMatch(text) {
+                // Try Exact Patterns First (Preference for multi-letter codes)
+                const plMatch = text.match(/^([A-Z]{2,3})([A-Z0-9]{4,5})$/);
+                if (plMatch && REGIONS.PL[plMatch[1]]) {
+                    return { country: 'PL', plate: `${plMatch[1]} ${plMatch[2]}`, region: REGIONS.PL[plMatch[1]], year: 'Modern' };
+                }
+
+                const deMatchNormal = text.match(/^([A-Z]{1,3})([A-Z]{1,2})(\d{1,4})$/);
+                if (deMatchNormal) {
+                    let city = deMatchNormal[1];
+                    let region = REGIONS.DE[city];
+                    if (!region && city.startsWith('H')) {
+                        const altCity = 'W' + city.slice(1);
+                        if (REGIONS.DE[altCity]) { city = altCity; region = REGIONS.DE[city]; }
+                    }
+                    if (region) return { country: 'DE', plate: `${city} ${deMatchNormal[2]} ${deMatchNormal[3]}`, region: region, year: 'Modern' };
+                }
+
+                const ukMatch = text.match(/^([A-Z]{2})([0-9]{2})([A-Z]{3})$/);
+                if (ukMatch) {
+                    const ukData = getUKRegionData(ukMatch[1]);
+                    if (ukData.region !== "Unknown") {
+                        const age = parseInt(ukMatch[2]);
+                        const period = age >= 51 ? `Late 20${age-50}` : `Early 20${age}`;
+                        return { country: 'UK', plate: ukMatch[0], region: `${ukData.region}, ${ukData.office}`, year: period };
+                    }
+                }
+
+                const chMatch = text.match(/^([A-Z]{2})(\d{1,6})$/);
+                if (chMatch && REGIONS.CH[chMatch[1]]) {
+                    return { country: 'CH', plate: `${chMatch[1]} ${chMatch[2]}`, region: REGIONS.CH[chMatch[1]], year: 'Modern' };
+                }
+
+                const aMatchNormal = text.match(/^([A-Z]{1,2})(\d{3,6}[A-Z]{0,2})$/);
+                if (aMatchNormal && REGIONS.A[aMatchNormal[1]]) {
+                    return { country: 'A', plate: `${aMatchNormal[1]} ${aMatchNormal[2]}`, region: REGIONS.A[aMatchNormal[1]], year: 'Modern' };
+                }
+
+                // Try "Seal/Sticker" Patterns
+                const plMatchSeal = text.match(/^([A-Z]{2,3})[A-Z0-9]([A-Z0-9]{4,5})$/);
+                if (plMatchSeal && REGIONS.PL[plMatchSeal[1]]) {
+                    return { country: 'PL', plate: `${plMatchSeal[1]} ${plMatchSeal[2]}`, region: REGIONS.PL[plMatchSeal[1]], year: 'Modern' };
+                }
+
+                const deMatchWithSeal = text.match(/^([A-Z]{1,3})[A-Z0-9]([A-Z]{1,2})(\d{1,4})$/);
+                if (deMatchWithSeal) {
+                    let city = deMatchWithSeal[1];
+                    let region = REGIONS.DE[city];
+                    if (!region && city.startsWith('H')) {
+                        const altCity = 'W' + city.slice(1);
+                        if (REGIONS.DE[altCity]) { city = altCity; region = REGIONS.DE[city]; }
+                    }
+                    if (region) return { country: 'DE', plate: `${city} ${deMatchWithSeal[2]} ${deMatchWithSeal[3]}`, region: region, year: 'Modern' };
+                }
+
+                const aMatchWithSeal = text.match(/^([A-Z]{1,2})[A-Z0-9](\d{3,6}[A-Z]{0,2})$/);
+                if (aMatchWithSeal && REGIONS.A[aMatchWithSeal[1]]) {
+                    return { country: 'A', plate: `${aMatchWithSeal[1]} ${aMatchWithSeal[2]}`, region: REGIONS.A[aMatchWithSeal[1]], year: 'Modern' };
+                }
+
+                return null;
             }
 
-            // Germany (D) Pattern: B AB 1234 (1-3 letters, 1-2 letters, 1-4 digits)
-            const deMatch = cleanText.match(/^([A-Z]{1,3})([A-Z]{1,2})(\d{1,4})$/);
-            if (deMatch) {
-                const cityCode = deMatch[1];
-                const region = REGIONS.DE[cityCode] || "Germany (Unknown City)";
-                return { country: 'DE', plate: `${deMatch[1]} ${deMatch[2]} ${deMatch[3]}`, region: region, year: 'Modern' };
-            }
+            let result = tryMatch(cleanText);
+            if (result) return result;
 
-            // Switzerland (CH) Pattern: ZH 123456 (2 letters, 1-6 digits)
-            const chMatch = cleanText.match(/^([A-Z]{2})(\d{1,6})$/);
-            if (chMatch) {
-                const region = REGIONS.CH[chMatch[1]] || "Switzerland (Unknown Canton)";
-                return { country: 'CH', plate: `${chMatch[1]} ${chMatch[2]}`, region: region, year: 'Modern' };
+            for (let i = 0; i < cleanText.length; i++) {
+                const char = cleanText[i];
+                if (OCR_REPLACEMENTS[char]) {
+                    const fuzzyText = cleanText.substring(0, i) + OCR_REPLACEMENTS[char] + cleanText.substring(i + 1);
+                    result = tryMatch(fuzzyText);
+                    if (result) return result;
+                }
             }
-
-            // Austria (A) Pattern: W 12345 A (1-2 letters, 3-6 alphanumeric)
-            const aMatch = cleanText.match(/^([A-Z]{1,2})(\d{3,6}[A-Z]{0,2})$/);
-            if (aMatch) {
-                const region = REGIONS.A[aMatch[1]] || "Austria (Unknown District)";
-                return { country: 'A', plate: `${aMatch[1]} ${aMatch[2]}`, region: region, year: 'Modern' };
-            }
-
-            // Poland (PL) Pattern: WA 12345 (2-3 letters, 4-5 alphanumeric)
-            const plMatch = cleanText.match(/^([A-Z]{2,3})([A-Z0-9]{4,5})$/);
-            if (plMatch) {
-                const cityCode = plMatch[1];
-                const region = REGIONS.PL[cityCode] || "Poland (Unknown City)";
-                return { country: 'PL', plate: `${plMatch[1]} ${plMatch[2]}`, region: region, year: 'Modern' };
-            }
-
             return null;
         }
 
@@ -455,7 +495,7 @@
         }
 
         function warpPlate(points) {
-            const width = 600; const height = 150; 
+            const width = 1000; const height = 240; 
             const vw = video.videoWidth; const vh = video.videoHeight;
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = vw; tempCanvas.height = vh;
@@ -473,13 +513,35 @@
             cv.warpPerspective(fullSrc, warpedMat, M, new cv.Size(width, height), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
             cv.cvtColor(warpedMat, warpedMat, cv.COLOR_RGBA2GRAY);
             warpedCanvas.width = width; warpedCanvas.height = height;
-            cv.imshow('warpedCanvas', warpedMat);
+            
+            // 1. Crop EU strip (left 5%)
+            let roiRect = new cv.Rect(width * 0.05, 0, width * 0.95, height);
+            let roi = warpedMat.roi(roiRect);
+            let cropped = new cv.Mat();
+            roi.copyTo(cropped);
+            roi.delete();
+
+            // 2. Bilateral filtering
+            let filtered = new cv.Mat();
+            cv.bilateralFilter(cropped, filtered, 9, 75, 75);
+            
+            // 3. Adaptive thresholding
+            cv.adaptiveThreshold(filtered, filtered, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 31, 5);
+            
+            // 4. Median blur
+            cv.medianBlur(filtered, filtered, 3);
+            
+            // 5. Slight erosion
+            let kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(2, 2));
+            cv.erode(filtered, filtered, kernel);
+            kernel.delete();
+
+            cv.imshow('warpedCanvas', filtered);
             resultDiv.classList.remove('hidden');
             textResult.innerHTML = "Confirming plate crop...";
             document.getElementById('ocrActions').classList.remove('hidden');
-            cv.threshold(warpedMat, warpedMat, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU);
-            cv.imshow('warpedCanvas', warpedMat);
-            fullSrc.delete(); srcCoords.delete(); dstCoords.delete(); M.delete(); warpedMat.delete();
+            
+            fullSrc.delete(); srcCoords.delete(); dstCoords.delete(); M.delete(); warpedMat.delete(); cropped.delete(); filtered.delete();
         }
 
         async function runOCR() {
@@ -493,9 +555,8 @@
             const patternMatch = matchPlatePattern(cleanText);
             isReviewing = false;
             
-            // Only store preview image if detection failed (to help with manual correction)
-            // Successful detections don't need to waste localStorage space (~20KB/ea)
-            const imageData = !patternMatch ? warpedCanvas.toDataURL('image/jpeg', 0.4) : null;
+            const isUnknown = !patternMatch || (patternMatch.region && patternMatch.region.includes("Unknown"));
+            const imageData = isUnknown ? warpedCanvas.toDataURL('image/jpeg', 0.4) : null;
             
             if (!patternMatch) {
                 statusEl.innerHTML = `<span class="result-error">Format Error (${duration}s)</span>`;
@@ -517,7 +578,7 @@
                 return;
             }
 
-            const plateData = { id: Date.now(), ...patternMatch, timestamp: new Date().toLocaleString(), lat: lat ? lat.toFixed(5) : null, lon: lon ? lon.toFixed(5) : null, isFailed: false, imageData: null };
+            const plateData = { id: Date.now(), ...patternMatch, timestamp: new Date().toLocaleString(), lat: lat ? lat.toFixed(5) : null, lon: lon ? lon.toFixed(5) : null, isFailed: false, imageData: imageData };
             saveToHistory(plateData);
             statusEl.innerHTML = `<span class="result-success">Success! (${duration}s)</span>`;
             textResult.innerHTML = `
@@ -536,8 +597,8 @@
             if (index === -1) return;
 
             if (patternMatch) {
-                // Clear the image once successfully corrected to save space
-                Object.assign(history[index], { ...patternMatch, isFailed: false, imageData: null });
+                const isUnknown = patternMatch.region && patternMatch.region.includes("Unknown");
+                Object.assign(history[index], { ...patternMatch, isFailed: false, imageData: isUnknown ? history[index].imageData : null });
                 localStorage.setItem('alpr_history', JSON.stringify(history));
                 renderHistory();
                 statusEl.innerHTML = `<span class="result-success">Corrected Successfully</span>`;
@@ -567,12 +628,8 @@
         function renderHistory() {
             const rawHistory = localStorage.getItem('alpr_history') || '[]';
             const history = JSON.parse(rawHistory);
-            
-            // Calculate size estimation
-            const bytes = rawHistory.length; // Approximate bytes for ASCII/Base64
-            const sizeStr = bytes > 1024 * 1024 
-                ? `${(bytes / (1024 * 1024)).toFixed(2)} MB` 
-                : `${(bytes / 1024).toFixed(1)} KB`;
+            const bytes = rawHistory.length;
+            const sizeStr = bytes > 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(2)} MB` : `${(bytes / 1024).toFixed(1)} KB`;
             document.getElementById('historyTitle').innerText = `History (${sizeStr})`;
 
             historyList.innerHTML = history.map(item => `
@@ -599,7 +656,6 @@
         }
 
         window.toggleDelete = (el) => el.classList.toggle('show-delete');
-        
         window.deletePreview = (e, id) => {
             e.stopPropagation();
             let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
@@ -610,19 +666,14 @@
                 renderHistory();
             }
         };
-
         window.triggerCorrection = (e, id) => {
             e.stopPropagation();
             let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
             const item = history.find(i => i.id === id);
             if (!item) return;
-
-            const userInput = prompt("Correct Plate Number (e.g., AB12CDE):", item.plate);
-            if (userInput !== null) {
-                applyCorrection(id, userInput);
-            }
+            const userInput = prompt("Correct Plate Number:", item.plate);
+            if (userInput !== null) applyCorrection(id, userInput);
         };
-
         window.deleteItem = (e, id) => {
             e.stopPropagation();
             let history = JSON.parse(localStorage.getItem('alpr_history') || '[]');
@@ -630,18 +681,15 @@
             localStorage.setItem('alpr_history', JSON.stringify(history));
             renderHistory();
         };
-
         clearHistoryBtn.addEventListener('click', () => {
             if (confirm("Clear all?")) { localStorage.setItem('alpr_history', '[]'); renderHistory(); }
         });
-
         function orderPoints(pts) {
             pts.sort((a, b) => a.x - b.x);
             let left = pts.slice(0, 2).sort((a, b) => a.y - b.y);
             let right = pts.slice(2, 4).sort((a, b) => a.y - b.y);
             return [left[0], right[0], right[1], left[1]]; 
         }
-
         function drawOverlay(points, color) {
             overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
             overlayCtx.strokeStyle = color; overlayCtx.lineWidth = 6;
